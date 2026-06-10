@@ -167,7 +167,6 @@ for scene in "${SCENES[@]}"; do
             nuscenes-v4 \
             --version "$VERSION" \
             --scene-name "$scene" \
-            $EXTRA_ARGS \
             >"$log" 2>&1; then
         status="OK"
         OK_RUN=$((OK_RUN+1))
