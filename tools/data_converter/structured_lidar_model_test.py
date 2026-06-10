@@ -25,6 +25,7 @@ from tools.data_converter.structured_lidar_model import (
     HDL32E_SCAN_DURATION_US,
     AlignedFrameData,
     ColumnAlignment,
+    _enforce_monotone_azimuths,
     assign_model_columns,
     compute_column_alignment,
     compute_frame_timestamps,
@@ -296,6 +297,59 @@ class TestStructuredLidarModel(unittest.TestCase):
         self.assertLess(opt_residual, initial_residual)
         # Should be near zero after 1 iteration with clean data
         self.assertLess(opt_residual, 1e-5)
+
+    # --- azimuth monotonicity / span enforcement (regression) ------------------
+
+    def test_optimize_model_early_column_overshoot_does_not_crash(self) -> None:
+        """Regression: a per-column correction that lifts an early column above col[0] must
+        still yield a valid model.
+
+        Previously such a column was displaced a full 2*pi and the unbounded clamp loop
+        cascaded the tail, pushing the total span >= 2*pi and raising AssertionError in
+        ``RowOffsetStructuredSpinningLidarModelParameters.__post_init__``. ``optimize_model``
+        returns a validated dataclass, so "does not raise" is itself the regression check.
+        """
+        model = upsample_model(self.model, 4)  # 4x: smallest inter-column step -> most fragile
+        n_cols, n_rows = model.n_columns, model.n_rows
+        model_cols = np.repeat(np.arange(n_cols, dtype=np.int64), n_rows)
+        model_rows = np.tile(np.arange(n_rows, dtype=np.int64), n_cols)
+        true_az = model.column_azimuths_rad[model_cols].astype(np.float64) + model.row_azimuth_offsets_rad[
+            model_rows
+        ].astype(np.float64)
+        # Lift column 1 above column 0 (0.2 deg > one inter-column step at 4x).
+        true_az[model_cols == 1] += np.radians(0.2)
+        distances = np.full(model_cols.shape, 30.0, dtype=np.float64)
+
+        optimized = optimize_model(
+            model, [true_az], [model_cols], [model_rows], [distances], min_range_m=10.0, n_iterations=1
+        )
+
+        az = optimized.column_azimuths_rad.astype(np.float64)
+        self.assertTrue(np.all(np.diff(az) < 0), "cw azimuths must stay strictly decreasing")
+        self.assertLess(az[0] - az[-1], 2 * np.pi, "total span must stay below one revolution")
+
+    def test_enforce_monotone_azimuths_clean_input_is_noop(self) -> None:
+        """A strictly-monotone, sub-2*pi input is returned unchanged (good models are untouched)."""
+        az = self.model.column_azimuths_rad.astype(np.float64)
+        out = _enforce_monotone_azimuths(az, self.model.n_columns, "cw")
+        np.testing.assert_allclose(out, np.unwrap(az), rtol=0, atol=1e-9)
+
+    def test_enforce_monotone_azimuths_caps_span_below_2pi(self) -> None:
+        """A monotone input whose span exceeds 2*pi is compressed back below one revolution (cw)."""
+        n = self.model.n_columns
+        az = -np.linspace(0.0, 2 * np.pi + np.radians(1.0), n)  # decreasing, span > 2*pi
+        out = _enforce_monotone_azimuths(az, n, "cw")
+        self.assertTrue(np.all(np.diff(out) < 0))
+        self.assertLess(out[0] - out[-1], 2 * np.pi)
+
+    def test_enforce_monotone_azimuths_ccw(self) -> None:
+        """CCW: a reordered early column is repaired to strictly-increasing azimuths, span < 2*pi."""
+        n = self.model.n_columns
+        az = np.linspace(0.0, 2 * np.pi - np.radians(0.5), n)  # increasing
+        az[2] = az[0] - np.radians(0.5)  # early-column reorder
+        out = _enforce_monotone_azimuths(az, n, "ccw")
+        self.assertTrue(np.all(np.diff(out) > 0))
+        self.assertLess(out[-1] - out[0], 2 * np.pi)
 
     # --- derive_nominal_hdl32e tests -------------------------------------------
 

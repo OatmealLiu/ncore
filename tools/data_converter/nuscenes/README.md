@@ -23,7 +23,8 @@ bazel run //tools/data_converter/nuscenes -- \
     --root-dir "/lustre/fs11/portfolios/nvr/projects/nvr_dvl_research/datasets/nuscenes" \
     --output-dir "/lustre/fs12/portfolios/nvr/projects/nvr_dvl_research/users/mingxuanl/datasets/ncoreV4/nuscenes" \
     nuscenes-v4 \
-    --version v1.0-trainval
+    --version v1.0-trainval \
+    --scene-name scene-0007
 ```
 
 ### Convert a single scene by token
