@@ -21,7 +21,7 @@ sudo chmod +x /usr/local/bin/bazel
 ```bash
 bazel run //tools/data_converter/nuscenes -- \
     --root-dir "/lustre/fs11/portfolios/nvr/projects/nvr_dvl_research/datasets/nuscenes" \
-    --output-dir "/lustre/fs12/portfolios/nvr/projects/nvr_dvl_research/users/mingxuanl/datasets/ncoreV3/nuscenes" \
+    --output-dir "/lustre/fs12/portfolios/nvr/projects/nvr_dvl_research/users/mingxuanl/datasets/ncoreV4/nuscenes" \
     nuscenes-v4 \
     --version v1.0-trainval
 ```
