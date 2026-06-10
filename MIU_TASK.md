@@ -17,10 +17,13 @@ Output dir for the converted NCore V4 format dataset: '/lustre/fs12/portfolios/n
 Machine: CS-OCI-ORD cluster
 Path: '/lustre/fs11/portfolios/nvr/projects/nvr_dvl_research/datasets/man_truckscenes'
 Original toolkit source code: 'tools/data_converter/man_truckscenes/man-truckscenes-devkit'
-Output dir for the converted NCore V4 format dataset: '/lustre/fs12/portfolios/nvr/projects/nvr_dvl_research/users/mingxuanl/datasets/ncoreV4'
+Output dir for the converted NCore V4 format dataset: '/lustre/fs12/portfolios/nvr/projects/nvr_dvl_research/users/mingxuanl/datasets/ncoreV4/man_truckscenes'
 
 ### Dataset 3: TruckDrive
 Machine: CS-OCI-ORD cluster
 Path: '/lustre/fs12/portfolios/nvr/projects/nvr_dvl_research/users/mingxuanl/datasets/raw/TruckDrive'
 Original toolkit source code: 'tools/data_converter/truckdrive/truckdrive-devkit'
-Output dir for the converted NCore V4 format dataset: '/lustre/fs12/portfolios/nvr/projects/nvr_dvl_research/users/mingxuanl/datasets/ncoreV4'
+Output dir for the converted NCore V4 format dataset: '/lustre/fs12/portfolios/nvr/projects/nvr_dvl_research/users/mingxuanl/datasets/ncoreV4/truckdrive'G
+
+
+

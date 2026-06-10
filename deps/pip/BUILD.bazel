@@ -36,6 +36,7 @@ pip_compile(
     data = [
         ":requirements_colmap.in",
         ":requirements_docs.in",
+        ":requirements_man_truckscenes.in",
         ":requirements_ncore.in",
         ":requirements_nuscenes.in",
         ":requirements_pai.in",
