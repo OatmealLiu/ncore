@@ -1,0 +1,4 @@
+numpy
+pyquaternion>=0.9.5
+tqdm
+pypcd4

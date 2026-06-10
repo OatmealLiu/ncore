@@ -8,11 +8,20 @@ Converts [nuScenes](https://www.nuscenes.org/) dataset scenes to NCore V4 format
 - Python packages: `nuscenes-devkit`, `pyquaternion`
 
 ## Usage
+```bash
+nuscenes_root="/lustre/fs11/portfolios/nvr/projects/nvr_dvl_research/datasets/nuscenes"
+ncore_out="/lustre/fs12/portfolios/nvr/projects/nvr_dvl_research/users/mingxuanl/datasets/ncoreV3/nuscenes"
+
+wget -O /lustre/fs12/portfolios/nvr/projects/nvr_dvl_research/users/mingxuanl/softwares/bazel https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64
+sudo chmod +x /usr/local/bin/bazel
+
+```
+
 
 ```bash
 bazel run //tools/data_converter/nuscenes -- \
-    --root-dir /path/to/nuscenes \
-    --output-dir /path/to/output \
+    --root-dir "/lustre/fs11/portfolios/nvr/projects/nvr_dvl_research/datasets/nuscenes" \
+    --output-dir "/lustre/fs12/portfolios/nvr/projects/nvr_dvl_research/users/mingxuanl/datasets/ncoreV3/nuscenes" \
     nuscenes-v4 \
     --version v1.0-trainval
 ```
