@@ -20,9 +20,12 @@
 #   tmux new -s nusc 'tools/data_converter/nuscenes/convert_scene_by_scene.sh; bash'
 #   # or:  nohup tools/data_converter/nuscenes/convert_scene_by_scene.sh &> nohup.out &
 #
+# The lidar model uses the converter's defaults: an EMPIRICAL HDL-32E model derived
+# per-scene (lidar_model_source=empirical, resolution=1, optimization_passes=1). The
+# azimuth-span-overflow bug that previously crashed some scenes is fixed, so this is safe.
+#
 # Override any default via environment variables:
 #   ROOT_DIR=...  OUTPUT_DIR=...  VERSION=...  LOG_DIR=...
-#   EXTRA_ARGS="--lidar-model-optimization-passes 0"   # e.g. to dodge the bug entirely
 #   CLEAN_PARTIAL=0                                     # keep partial output of failed scenes
 #   ONLY_FAILED=1                                       # retry only scenes in failed.txt
 
@@ -33,12 +36,6 @@ ROOT_DIR="${ROOT_DIR:-/lustre/fs11/portfolios/nvr/projects/nvr_dvl_research/data
 OUTPUT_DIR="${OUTPUT_DIR:-/lustre/fs12/portfolios/nvr/projects/nvr_dvl_research/users/mingxuanl/datasets/ncoreV4/nuscenes}"
 VERSION="${VERSION:-v1.0-trainval}"
 LOG_DIR="${LOG_DIR:-${OUTPUT_DIR%/}/_conversion_logs}"
-
-# Lidar-model quality settings. These mirror the converter's defaults / the
-# README "recommended for best quality". Optimization is ON so good scenes get
-# the refined model; scenes that hit the optimizer bug fail and are recorded.
-# Set EXTRA_ARGS="--lidar-model-optimization-passes 0" to avoid the bug entirely.
-EXTRA_ARGS="${EXTRA_ARGS:---lidar-model-source nominal --lidar-model-resolution 4 --lidar-model-optimization-passes 1}"
 
 # Remove a scene's partial output dir before a (re)attempt and after a failure.
 CLEAN_PARTIAL="${CLEAN_PARTIAL:-1}"
@@ -138,7 +135,7 @@ trap 'echo; echo "Interrupted."; print_summary; exit 130' INT TERM
 echo "Converting $N scene(s) from '$VERSION' one by one ..."
 echo "  root=$ROOT_DIR"
 echo "  out =$OUTPUT_DIR"
-echo "  args=$EXTRA_ARGS"
+echo "  lidar-model=empirical (converter defaults)"
 echo
 
 for scene in "${SCENES[@]}"; do
@@ -160,7 +157,6 @@ for scene in "${SCENES[@]}"; do
     log="$LOG_DIR/$scene.log"
     start=$SECONDS
 
-    # shellcheck disable=SC2086  # EXTRA_ARGS is intentionally word-split
     if bazel run "$TARGET" -- \
             --root-dir "$ROOT_DIR" \
             --output-dir "$OUTPUT_DIR" \

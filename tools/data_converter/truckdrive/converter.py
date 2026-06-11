@@ -88,22 +88,30 @@ class TruckDriveConverter4Config(FileBasedDataConverterConfig):
 class TruckDriveConverter4(FileBasedDataConverter):
     """Dataset preprocessing class for converting TruckDrive data to NCore V4 format.
 
+    On-disk layout (post-reorg, see folder_structure_report.txt): per-scene sensor dirs are
+    grouped under camera/, lidar/, radar/; ego poses under poses/; labels under annotations/;
+    calibration under calibrations/. The root-level mmdet_annotations/ and sensor_sync/ folders
+    (from the devkit's generate_training_data) are NOT consumed -- this converter reads the raw
+    per-sensor files directly for full fidelity (per-point timestamps, intensity, Doppler, ring).
+
     Sensor suite & assumptions:
-    - Cameras (11 leopard positions): RGB JPEGs under leopard/<pos>/images. Per-camera
+    - Cameras (11 leopard positions): RGB JPEGs under camera/leopard/<pos>/images. Per-camera
       projection model chosen from the calib distortion_model: 'plumb_bob' -> OpenCV
       pinhole, 'equidistant' -> OpenCV fisheye. Distortion coeffs are zero on disk
       (images delivered rectified to their model); global shutter.
-    - LiDARs: 3 Ouster spinning (.bin float32, 7 cols x,y,z,intensity,rel_time_ns,
-      reflectivity,ring) + 1 Aeva FMCW joint (.bin float64, 11 cols incl. per-point
-      Doppler velocity + a vx,vy,vz vector). Stored as generic ray bundles
-      (LidarSensorComponent, no structured model). Per-point timestamps come from the
-      per-point time offset added to the frame's filename timestamp.
-    - Radar: Continental conti542 joint (.bin float64, 33 cols). Stored as a ray bundle;
-      radial velocity + rcs/amplitude/velocity-vectors carried in generic_data.
+    - LiDARs: 3 Ouster spinning under lidar/ouster/<pos>/points (.bin float32, 7 cols
+      x,y,z,intensity,rel_time_ns,reflectivity,ring) + 1 Aeva FMCW joint under
+      lidar/aeva/joint_lidars/points (.bin float64, 11 cols incl. per-point Doppler velocity +
+      a vx,vy,vz vector). Stored as generic ray bundles (LidarSensorComponent, no structured
+      model). Per-point timestamps come from the per-point time offset added to the frame's
+      filename timestamp.
+    - Radar: Continental conti542 joint under radar/conti542/joint_radars/detections (.bin
+      float64, 33 cols). Stored as a ray bundle; radial velocity + rcs/amplitude/velocity-vectors
+      carried in generic_data.
     - Ego motion: single 'rig' frame (the devkit 'vehicle' frame). Dynamic rig->world from
-      gt_trajectory.txt (scene-local), anchored via static world->world_global. Per-sensor
-      static extrinsics resolved from the per-scene tf tree via BFS.
-    - Cuboids: 3D boxes from bounding_boxes/*.json in the 'velodyne' frame (a static
+      poses/gt_trajectory.txt (scene-local), anchored via static world->world_global. Per-sensor
+      static extrinsics resolved from the per-scene tf tree (calibrations/) via BFS.
+    - Cuboids: 3D boxes from annotations/bounding_boxes/*.json in the 'velodyne' frame (a static
       velodyne->rig pose is stored so they can be interpreted); coarse class from metainfo.
     """
 
@@ -301,7 +309,11 @@ class TruckDriveConverter4(FileBasedDataConverter):
         points = utils.load_point_bin(path, spec["dtype"], spec["cols"])
         time_col = 4 if spec["kind"] == "ouster" else 6
         offset_ns = points[:, time_col].astype(np.int64) if points.size else np.zeros(0, dtype=np.int64)
-        timestamp_us = ((np.int64(frame_ts_ns) + offset_ns) // 1000).astype(np.uint64)
+        # Clamp absolute time at 0 BEFORE the uint64 cast: the first synced frame can have
+        # frame_ts_ns=0 (e.g. aeva 0000_0.bin), so a stray negative per-point offset would
+        # otherwise floor-divide negative and wrap to a garbage ~1.8e19 us timestamp.
+        abs_ns = np.maximum(np.int64(frame_ts_ns) + offset_ns, np.int64(0))
+        timestamp_us = (abs_ns // 1000).astype(np.uint64)
         return points, timestamp_us
 
     def _decode_lidars(self, scene_dir, tf_graph, store_writer, poses_writer, component_groups, lidar_ids) -> None:
@@ -403,6 +415,18 @@ class TruckDriveConverter4(FileBasedDataConverter):
                 continue
             with calib_path.open() as f:
                 calib = json.load(f)
+
+            # _camera_model_from_calib emits a zero-distortion model (assumes images are delivered
+            # rectified, matching the devkit which uses the projection matrix P directly). If the calib
+            # actually carries non-zero distortion coefficients, surface it loudly so it is not silently
+            # dropped into a wrong projection model.
+            distortion = calib.get("D", calib.get("distortion_coefficients"))
+            if distortion is not None and np.any(np.abs(np.asarray(distortion, dtype=np.float64)) > 1e-9):
+                self.logger.warning(
+                    f"Camera {ncore_id}: calib has NON-ZERO distortion {np.asarray(distortion).ravel().tolist()[:8]} "
+                    f"(model='{calib.get('distortion_model', '')}'), but the converter emits a zero-distortion model "
+                    f"(assumes rectified images). Verify the JPEGs are rectified, else intrinsics are wrong."
+                )
 
             poses_writer.store_static_pose(
                 source_frame_id=ncore_id,
@@ -506,7 +530,12 @@ class TruckDriveConverter4(FileBasedDataConverter):
                     continue
                 xyz, distance_m, points = xyz[valid], distance_m[valid], points[valid]
                 direction = (xyz / distance_m[:, np.newaxis]).astype(np.float32)
-                velocity_vec = points[:, 27:30].astype(np.float32)  # compensated vx,vy,vz
+                # Conti542 33-col layout (devkit dataset_details.py / colorize.py / README): the primary
+                # velocity triple is cols 27-29 (vx,vy,vz); cols 30-32 (vx0,vy0,vz0) are a second triple
+                # whose ego-compensation semantics the devkit does not document -- carry BOTH verbatim and
+                # let the downstream consumer choose. radial_velocity projects the primary triple onto the ray.
+                velocity_vec = points[:, 27:30].astype(np.float32)
+                velocity_vec0 = points[:, 30:33].astype(np.float32)
                 radial_velocity = np.sum(velocity_vec * direction, axis=1).astype(np.float32)
 
                 frame_ts = int(ts_ns // 1000)
@@ -526,6 +555,9 @@ class TruckDriveConverter4(FileBasedDataConverter):
                         "velocity_x_m_s": velocity_vec[:, 0],
                         "velocity_y_m_s": velocity_vec[:, 1],
                         "velocity_z_m_s": velocity_vec[:, 2],
+                        "velocity_x0_m_s": velocity_vec0[:, 0],
+                        "velocity_y0_m_s": velocity_vec0[:, 1],
+                        "velocity_z0_m_s": velocity_vec0[:, 2],
                     },
                     generic_meta_data={},
                 )

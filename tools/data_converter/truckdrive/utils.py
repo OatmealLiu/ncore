@@ -51,8 +51,8 @@ from upath import UPath
 # --- Scene-relative file/dir conventions ---------------------------------------
 
 TF_TREE_FILE = "calib_tf_tree_full.json"
-TRAJECTORY_FILE = "gt_trajectory.txt"
-BOUNDING_BOXES_DIR = "bounding_boxes"
+TRAJECTORY_FILE = "poses/gt_trajectory.txt"
+BOUNDING_BOXES_DIR = "annotations/bounding_boxes"
 RIG_NODE = "vehicle"  # the devkit ego/vehicle frame == NCore "rig"
 ANNOTATION_NODE = "velodyne"  # frame the 3D bounding boxes are expressed in
 
@@ -82,28 +82,28 @@ CAMERA_POSITIONS: Tuple[str, ...] = (
 # NCore lidar id -> {dir (relative to scene), tf node, dtype, cols, kind}
 LIDAR_SENSORS: Dict[str, Dict] = {
     "ouster_forward_center": {
-        "dir": "ouster/forward_center/points",
+        "dir": "lidar/ouster/forward_center/points",
         "node": "lidar_ouster_forward_center",
         "dtype": np.float32,
         "cols": 7,
         "kind": "ouster",
     },
     "ouster_sideward_left": {
-        "dir": "ouster/sideward_left/points",
+        "dir": "lidar/ouster/sideward_left/points",
         "node": "lidar_ouster_sideward_left",
         "dtype": np.float32,
         "cols": 7,
         "kind": "ouster",
     },
     "ouster_sideward_right": {
-        "dir": "ouster/sideward_right/points",
+        "dir": "lidar/ouster/sideward_right/points",
         "node": "lidar_ouster_sideward_right",
         "dtype": np.float32,
         "cols": 7,
         "kind": "ouster",
     },
     "aeva": {
-        "dir": "aeva/joint_lidars/points",
+        "dir": "lidar/aeva/joint_lidars/points",
         "node": "lidar_aeva_forward_center_wide",
         "dtype": np.float64,
         "cols": 11,
@@ -114,7 +114,7 @@ LIDAR_SENSORS: Dict[str, Dict] = {
 # NCore radar id -> {dir, tf node, dtype, cols}
 RADAR_SENSORS: Dict[str, Dict] = {
     "conti542": {
-        "dir": "conti542/joint_radars/detections",
+        "dir": "radar/conti542/joint_radars/detections",
         "node": "radar_conti542_forward_left_high",
         "dtype": np.float64,
         "cols": 33,
@@ -127,7 +127,7 @@ def camera_tf_node(position: str) -> str:
 
 
 def camera_images_dir(position: str) -> str:
-    return f"leopard/{position}/images"
+    return f"camera/leopard/{position}/images"
 
 
 def camera_calib_file(position: str) -> str:
@@ -135,8 +135,8 @@ def camera_calib_file(position: str) -> str:
 
 
 def camera_depth_dir(position: str) -> str:
-    # Accumulated GT depth lives at the scene root under the bare position name.
-    return position
+    # Accumulated GT depth lives under accumulated_gt_depth/<position>.
+    return f"accumulated_gt_depth/{position}"
 
 
 # --- Scene / frame enumeration -------------------------------------------------
