@@ -20,9 +20,10 @@
 #   tmux new -s nusc 'tools/data_converter/nuscenes/convert_scene_by_scene.sh; bash'
 #   # or:  nohup tools/data_converter/nuscenes/convert_scene_by_scene.sh &> nohup.out &
 #
-# The lidar model uses the converter's defaults: an EMPIRICAL HDL-32E model derived
-# per-scene (lidar_model_source=empirical, resolution=1, optimization_passes=1). The
-# azimuth-span-overflow bug that previously crashed some scenes is fixed, so this is safe.
+# The lidar model uses the converter's CLI defaults (no lidar flags are passed below): an
+# EMPIRICAL HDL-32E model derived per-scene, lidar_model_resolution=4, optimization_passes=1.
+# The azimuth-span-overflow bug that previously crashed some scenes at 4x is now fixed
+# (optimize_model global/local correction split + enforce_cw_monotonic), so this is safe.
 #
 # Override any default via environment variables:
 #   ROOT_DIR=...  OUTPUT_DIR=...  VERSION=...  LOG_DIR=...
