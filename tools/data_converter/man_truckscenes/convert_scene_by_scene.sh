@@ -18,12 +18,12 @@
 #
 # Override any default via environment variables:
 #   ROOT_DIR=...  OUTPUT_DIR=...  VERSION=...  LOG_DIR=...
-#   EXTRA_ARGS="--all-sweeps"     # default --keyframes-only (~2 Hz). --all-sweeps = full 10-20 Hz cadence (~5-9x data)
+#   EXTRA_ARGS="--keyframes-only" # default --all-sweeps (full cadence); --keyframes-only = ~2 Hz subset (~4-5x smaller)
 #   CLEAN_PARTIAL=0               # keep partial output of failed scenes
 #   ONLY_FAILED=1                 # retry only scenes in failed.txt
 #
-# Disk budget: keyframes-only is ~0.3 GB/scene => ~170 GB for all 598 scenes; --all-sweeps is
-# several times larger. Make sure the quota has headroom before launching.
+# Disk budget: --all-sweeps (default) is roughly 1.2-1.5 GB/scene => ~0.8-1 TB for all 598 scenes;
+# --keyframes-only is ~0.3 GB/scene (~170 GB). Make sure the quota has headroom before launching.
 
 set -uo pipefail
 
@@ -32,9 +32,10 @@ ROOT_DIR="${ROOT_DIR:-/lustre/fs11/portfolios/nvr/projects/nvr_dvl_research/data
 OUTPUT_DIR="${OUTPUT_DIR:-/lustre/fs12/portfolios/nvr/projects/nvr_dvl_research/users/mingxuanl/datasets/ncoreV4/man_truckscenes}"
 VERSION="${VERSION:-v1.2-trainval}"
 LOG_DIR="${LOG_DIR:-${OUTPUT_DIR%/}/_conversion_logs}"
-# Per-scene converter flags (passed after the man-truckscenes-v4 subcommand). Default keyframes
-# only (manageable); use EXTRA_ARGS="--all-sweeps" for the full sweep cadence.
-EXTRA_ARGS="${EXTRA_ARGS:---keyframes-only}"
+# Per-scene converter flags (passed after the man-truckscenes-v4 subcommand). Default --all-sweeps
+# = the full ~10-20 Hz sensor cadence (what reconstruction wants). Set EXTRA_ARGS="--keyframes-only"
+# for the fast ~2 Hz keyframe subset (~4-5x smaller; good for quick tests).
+EXTRA_ARGS="${EXTRA_ARGS:---all-sweeps}"
 CLEAN_PARTIAL="${CLEAN_PARTIAL:-1}"
 ONLY_FAILED="${ONLY_FAILED:-0}"
 # Abort after this many consecutive instant (<5s) failures -- a backstop for systemic problems
