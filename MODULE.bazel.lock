@@ -1502,7 +1502,7 @@
         "bzlTransitiveDigest": "WyF2tLBpR8cyete55VmU+AwLC/mhDbnIlEdbVymbm04=",
         "usagesDigest": "DXk0VBJUK7HdLXJE59BVPG4lCTTPnHGNQg/SH9dTuVE=",
         "recordedFileInputs": {
-          "@@//deps/pip/requirements_3_11.txt": "01687dd0690641cecfe0cfa3a5a8ba2186f65112c34b4ab7b64caa55a416ae56",
+          "@@//deps/pip/requirements_3_11.txt": "38773cd7ddb1886c93725191346d32adcce9e3cd298c19d2cfdaf7cc2a04da84",
           "@@//deps/pip/requirements_3_8.txt": "94c254d645dc1d0555f48e66fa499aa2efecfc5e547500cd4ed409aee28e8880",
           "@@rules_fuzzing+//fuzzing/requirements.txt": "ab04664be026b632a0d2a2446c4f65982b7654f5b6851d2f9d399a19b7242a5b",
           "@@rules_python+//tools/publish/requirements_darwin.txt": "095d4a4f3d639dce831cd493367631cd51b53665292ab20194bac2c0c6458fa8",
@@ -1674,6 +1674,60 @@
               "sha256": "75a8b99c28a5dad50dd7f8ccdd447a121ddb3892da9e53d1ca5cca3106d58d65",
               "urls": [
                 "https://files.pythonhosted.org/packages/c9/3e/13dd8e5ed9094e734ac430b5d0eb4f2bb001708a8b7856cbf8e084e001ba/alabaster-0.7.16.tar.gz"
+              ]
+            }
+          },
+          "ncore_pip_deps_311_annotated_types_py3_none_any_1f02e8b4": {
+            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
+            "attributes": {
+              "dep_template": "@ncore_pip_deps//{name}:{target}",
+              "experimental_target_platforms": [
+                "cp311_linux_aarch64",
+                "cp311_linux_arm",
+                "cp311_linux_ppc",
+                "cp311_linux_s390x",
+                "cp311_linux_x86_64",
+                "cp311_osx_aarch64",
+                "cp311_osx_x86_64",
+                "cp311_windows_x86_64"
+              ],
+              "filename": "annotated_types-0.7.0-py3-none-any.whl",
+              "python_interpreter_target": "@@rules_python++python+python_3_11_host//:python",
+              "repo": "ncore_pip_deps_311",
+              "requirement": "annotated-types==0.7.0",
+              "sha256": "1f02e8b43a8fbbc3f3e0d4f0f4bfc8131bcb4eebe8849b8e5c773f3a1c582a53",
+              "urls": [
+                "https://files.pythonhosted.org/packages/78/b6/6307fbef88d9b5ee7421e68d78a9f162e0da4900bc5f5793f6d3d0e34fb8/annotated_types-0.7.0-py3-none-any.whl"
+              ]
+            }
+          },
+          "ncore_pip_deps_311_annotated_types_sdist_aff07c09": {
+            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
+            "attributes": {
+              "dep_template": "@ncore_pip_deps//{name}:{target}",
+              "experimental_target_platforms": [
+                "cp311_linux_aarch64",
+                "cp311_linux_arm",
+                "cp311_linux_ppc",
+                "cp311_linux_s390x",
+                "cp311_linux_x86_64",
+                "cp311_osx_aarch64",
+                "cp311_osx_x86_64",
+                "cp311_windows_x86_64"
+              ],
+              "extra_pip_args": [
+                "--index-url",
+                "https://pypi.org/simple",
+                "--find-links",
+                "https://download.pytorch.org/whl/cu128/torch"
+              ],
+              "filename": "annotated_types-0.7.0.tar.gz",
+              "python_interpreter_target": "@@rules_python++python+python_3_11_host//:python",
+              "repo": "ncore_pip_deps_311",
+              "requirement": "annotated-types==0.7.0",
+              "sha256": "aff07c09a53a08bc8cfccb9c85b05f1aa9a2a6f23728d790723543408344ce89",
+              "urls": [
+                "https://files.pythonhosted.org/packages/ee/67/531ea369ba64dcff5ec9c3402f9f51bf748cec26dde048a2f973a4eea7f5/annotated_types-0.7.0.tar.gz"
               ]
             }
           },
@@ -11817,6 +11871,354 @@
               ]
             }
           },
+          "ncore_pip_deps_311_pydantic_core_cp311_cp311_macosx_10_12_x86_64_4c5b0a57": {
+            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
+            "attributes": {
+              "dep_template": "@ncore_pip_deps//{name}:{target}",
+              "experimental_target_platforms": [
+                "cp311_linux_aarch64",
+                "cp311_linux_arm",
+                "cp311_linux_ppc",
+                "cp311_linux_s390x",
+                "cp311_linux_x86_64",
+                "cp311_osx_aarch64",
+                "cp311_osx_x86_64",
+                "cp311_windows_x86_64"
+              ],
+              "filename": "pydantic_core-2.33.2-cp311-cp311-macosx_10_12_x86_64.whl",
+              "python_interpreter_target": "@@rules_python++python+python_3_11_host//:python",
+              "repo": "ncore_pip_deps_311",
+              "requirement": "pydantic-core==2.33.2",
+              "sha256": "4c5b0a576fb381edd6d27f0a85915c6daf2f8138dc5c267a57c08a62900758c7",
+              "urls": [
+                "https://files.pythonhosted.org/packages/3f/8d/71db63483d518cbbf290261a1fc2839d17ff89fce7089e08cad07ccfce67/pydantic_core-2.33.2-cp311-cp311-macosx_10_12_x86_64.whl"
+              ]
+            }
+          },
+          "ncore_pip_deps_311_pydantic_core_cp311_cp311_macosx_11_0_arm64_e799c050": {
+            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
+            "attributes": {
+              "dep_template": "@ncore_pip_deps//{name}:{target}",
+              "experimental_target_platforms": [
+                "cp311_linux_aarch64",
+                "cp311_linux_arm",
+                "cp311_linux_ppc",
+                "cp311_linux_s390x",
+                "cp311_linux_x86_64",
+                "cp311_osx_aarch64",
+                "cp311_osx_x86_64",
+                "cp311_windows_x86_64"
+              ],
+              "filename": "pydantic_core-2.33.2-cp311-cp311-macosx_11_0_arm64.whl",
+              "python_interpreter_target": "@@rules_python++python+python_3_11_host//:python",
+              "repo": "ncore_pip_deps_311",
+              "requirement": "pydantic-core==2.33.2",
+              "sha256": "e799c050df38a639db758c617ec771fd8fb7a5f8eaaa4b27b101f266b216a246",
+              "urls": [
+                "https://files.pythonhosted.org/packages/24/2f/3cfa7244ae292dd850989f328722d2aef313f74ffc471184dc509e1e4e5a/pydantic_core-2.33.2-cp311-cp311-macosx_11_0_arm64.whl"
+              ]
+            }
+          },
+          "ncore_pip_deps_311_pydantic_core_cp311_cp311_manylinux_2_17_aarch64_dc46a01b": {
+            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
+            "attributes": {
+              "dep_template": "@ncore_pip_deps//{name}:{target}",
+              "experimental_target_platforms": [
+                "cp311_linux_aarch64",
+                "cp311_linux_arm",
+                "cp311_linux_ppc",
+                "cp311_linux_s390x",
+                "cp311_linux_x86_64",
+                "cp311_osx_aarch64",
+                "cp311_osx_x86_64",
+                "cp311_windows_x86_64"
+              ],
+              "filename": "pydantic_core-2.33.2-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl",
+              "python_interpreter_target": "@@rules_python++python+python_3_11_host//:python",
+              "repo": "ncore_pip_deps_311",
+              "requirement": "pydantic-core==2.33.2",
+              "sha256": "dc46a01bf8d62f227d5ecee74178ffc448ff4e5197c756331f71efcc66dc980f",
+              "urls": [
+                "https://files.pythonhosted.org/packages/b3/d3/4ae42d33f5e3f50dd467761304be2fa0a9417fbf09735bc2cce003480f2a/pydantic_core-2.33.2-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl"
+              ]
+            }
+          },
+          "ncore_pip_deps_311_pydantic_core_cp311_cp311_manylinux_2_17_armv7l_a144d4f7": {
+            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
+            "attributes": {
+              "dep_template": "@ncore_pip_deps//{name}:{target}",
+              "experimental_target_platforms": [
+                "cp311_linux_aarch64",
+                "cp311_linux_arm",
+                "cp311_linux_ppc",
+                "cp311_linux_s390x",
+                "cp311_linux_x86_64",
+                "cp311_osx_aarch64",
+                "cp311_osx_x86_64",
+                "cp311_windows_x86_64"
+              ],
+              "filename": "pydantic_core-2.33.2-cp311-cp311-manylinux_2_17_armv7l.manylinux2014_armv7l.whl",
+              "python_interpreter_target": "@@rules_python++python+python_3_11_host//:python",
+              "repo": "ncore_pip_deps_311",
+              "requirement": "pydantic-core==2.33.2",
+              "sha256": "a144d4f717285c6d9234a66778059f33a89096dfb9b39117663fd8413d582dcc",
+              "urls": [
+                "https://files.pythonhosted.org/packages/f4/f3/aa5976e8352b7695ff808599794b1fba2a9ae2ee954a3426855935799488/pydantic_core-2.33.2-cp311-cp311-manylinux_2_17_armv7l.manylinux2014_armv7l.whl"
+              ]
+            }
+          },
+          "ncore_pip_deps_311_pydantic_core_cp311_cp311_manylinux_2_17_ppc64le_73cf6373": {
+            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
+            "attributes": {
+              "dep_template": "@ncore_pip_deps//{name}:{target}",
+              "experimental_target_platforms": [
+                "cp311_linux_aarch64",
+                "cp311_linux_arm",
+                "cp311_linux_ppc",
+                "cp311_linux_s390x",
+                "cp311_linux_x86_64",
+                "cp311_osx_aarch64",
+                "cp311_osx_x86_64",
+                "cp311_windows_x86_64"
+              ],
+              "filename": "pydantic_core-2.33.2-cp311-cp311-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl",
+              "python_interpreter_target": "@@rules_python++python+python_3_11_host//:python",
+              "repo": "ncore_pip_deps_311",
+              "requirement": "pydantic-core==2.33.2",
+              "sha256": "73cf6373c21bc80b2e0dc88444f41ae60b2f070ed02095754eb5a01df12256de",
+              "urls": [
+                "https://files.pythonhosted.org/packages/d5/7a/cda9b5a23c552037717f2b2a5257e9b2bfe45e687386df9591eff7b46d28/pydantic_core-2.33.2-cp311-cp311-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl"
+              ]
+            }
+          },
+          "ncore_pip_deps_311_pydantic_core_cp311_cp311_manylinux_2_17_s390x_3dc625f4": {
+            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
+            "attributes": {
+              "dep_template": "@ncore_pip_deps//{name}:{target}",
+              "experimental_target_platforms": [
+                "cp311_linux_aarch64",
+                "cp311_linux_arm",
+                "cp311_linux_ppc",
+                "cp311_linux_s390x",
+                "cp311_linux_x86_64",
+                "cp311_osx_aarch64",
+                "cp311_osx_x86_64",
+                "cp311_windows_x86_64"
+              ],
+              "filename": "pydantic_core-2.33.2-cp311-cp311-manylinux_2_17_s390x.manylinux2014_s390x.whl",
+              "python_interpreter_target": "@@rules_python++python+python_3_11_host//:python",
+              "repo": "ncore_pip_deps_311",
+              "requirement": "pydantic-core==2.33.2",
+              "sha256": "3dc625f4aa79713512d1976fe9f0bc99f706a9dee21dfd1810b4bbbf228d0e8a",
+              "urls": [
+                "https://files.pythonhosted.org/packages/2b/9f/b8f9ec8dd1417eb9da784e91e1667d58a2a4a7b7b34cf4af765ef663a7e5/pydantic_core-2.33.2-cp311-cp311-manylinux_2_17_s390x.manylinux2014_s390x.whl"
+              ]
+            }
+          },
+          "ncore_pip_deps_311_pydantic_core_cp311_cp311_manylinux_2_17_x86_64_881b21b5": {
+            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
+            "attributes": {
+              "dep_template": "@ncore_pip_deps//{name}:{target}",
+              "experimental_target_platforms": [
+                "cp311_linux_aarch64",
+                "cp311_linux_arm",
+                "cp311_linux_ppc",
+                "cp311_linux_s390x",
+                "cp311_linux_x86_64",
+                "cp311_osx_aarch64",
+                "cp311_osx_x86_64",
+                "cp311_windows_x86_64"
+              ],
+              "filename": "pydantic_core-2.33.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+              "python_interpreter_target": "@@rules_python++python+python_3_11_host//:python",
+              "repo": "ncore_pip_deps_311",
+              "requirement": "pydantic-core==2.33.2",
+              "sha256": "881b21b5549499972441da4758d662aeea93f1923f953e9cbaff14b8b9565aef",
+              "urls": [
+                "https://files.pythonhosted.org/packages/47/bc/cd720e078576bdb8255d5032c5d63ee5c0bf4b7173dd955185a1d658c456/pydantic_core-2.33.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+              ]
+            }
+          },
+          "ncore_pip_deps_311_pydantic_core_cp311_cp311_musllinux_1_1_aarch64_fe5b3218": {
+            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
+            "attributes": {
+              "dep_template": "@ncore_pip_deps//{name}:{target}",
+              "experimental_target_platforms": [
+                "cp311_linux_aarch64",
+                "cp311_linux_arm",
+                "cp311_linux_ppc",
+                "cp311_linux_s390x",
+                "cp311_linux_x86_64",
+                "cp311_osx_aarch64",
+                "cp311_osx_x86_64",
+                "cp311_windows_x86_64"
+              ],
+              "filename": "pydantic_core-2.33.2-cp311-cp311-musllinux_1_1_aarch64.whl",
+              "python_interpreter_target": "@@rules_python++python+python_3_11_host//:python",
+              "repo": "ncore_pip_deps_311",
+              "requirement": "pydantic-core==2.33.2",
+              "sha256": "fe5b32187cbc0c862ee201ad66c30cf218e5ed468ec8dc1cf49dec66e160cc4d",
+              "urls": [
+                "https://files.pythonhosted.org/packages/ff/e6/e3c5908c03cf00d629eb38393a98fccc38ee0ce8ecce32f69fc7d7b558a7/pydantic_core-2.33.2-cp311-cp311-musllinux_1_1_aarch64.whl"
+              ]
+            }
+          },
+          "ncore_pip_deps_311_pydantic_core_cp311_cp311_musllinux_1_1_armv7l_bc7aee6f": {
+            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
+            "attributes": {
+              "dep_template": "@ncore_pip_deps//{name}:{target}",
+              "experimental_target_platforms": [
+                "cp311_linux_aarch64",
+                "cp311_linux_arm",
+                "cp311_linux_ppc",
+                "cp311_linux_s390x",
+                "cp311_linux_x86_64",
+                "cp311_osx_aarch64",
+                "cp311_osx_x86_64",
+                "cp311_windows_x86_64"
+              ],
+              "filename": "pydantic_core-2.33.2-cp311-cp311-musllinux_1_1_armv7l.whl",
+              "python_interpreter_target": "@@rules_python++python+python_3_11_host//:python",
+              "repo": "ncore_pip_deps_311",
+              "requirement": "pydantic-core==2.33.2",
+              "sha256": "bc7aee6f634a6f4a95676fcb5d6559a2c2a390330098dba5e5a5f28a2e4ada30",
+              "urls": [
+                "https://files.pythonhosted.org/packages/12/e7/6a36a07c59ebefc8777d1ffdaf5ae71b06b21952582e4b07eba88a421c79/pydantic_core-2.33.2-cp311-cp311-musllinux_1_1_armv7l.whl"
+              ]
+            }
+          },
+          "ncore_pip_deps_311_pydantic_core_cp311_cp311_musllinux_1_1_x86_64_235f45e5": {
+            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
+            "attributes": {
+              "dep_template": "@ncore_pip_deps//{name}:{target}",
+              "experimental_target_platforms": [
+                "cp311_linux_aarch64",
+                "cp311_linux_arm",
+                "cp311_linux_ppc",
+                "cp311_linux_s390x",
+                "cp311_linux_x86_64",
+                "cp311_osx_aarch64",
+                "cp311_osx_x86_64",
+                "cp311_windows_x86_64"
+              ],
+              "filename": "pydantic_core-2.33.2-cp311-cp311-musllinux_1_1_x86_64.whl",
+              "python_interpreter_target": "@@rules_python++python+python_3_11_host//:python",
+              "repo": "ncore_pip_deps_311",
+              "requirement": "pydantic-core==2.33.2",
+              "sha256": "235f45e5dbcccf6bd99f9f472858849f73d11120d76ea8707115415f8e5ebebf",
+              "urls": [
+                "https://files.pythonhosted.org/packages/16/3f/59b3187aaa6cc0c1e6616e8045b284de2b6a87b027cce2ffcea073adf1d2/pydantic_core-2.33.2-cp311-cp311-musllinux_1_1_x86_64.whl"
+              ]
+            }
+          },
+          "ncore_pip_deps_311_pydantic_core_cp311_cp311_win_amd64_1e063337": {
+            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
+            "attributes": {
+              "dep_template": "@ncore_pip_deps//{name}:{target}",
+              "experimental_target_platforms": [
+                "cp311_linux_aarch64",
+                "cp311_linux_arm",
+                "cp311_linux_ppc",
+                "cp311_linux_s390x",
+                "cp311_linux_x86_64",
+                "cp311_osx_aarch64",
+                "cp311_osx_x86_64",
+                "cp311_windows_x86_64"
+              ],
+              "filename": "pydantic_core-2.33.2-cp311-cp311-win_amd64.whl",
+              "python_interpreter_target": "@@rules_python++python+python_3_11_host//:python",
+              "repo": "ncore_pip_deps_311",
+              "requirement": "pydantic-core==2.33.2",
+              "sha256": "1e063337ef9e9820c77acc768546325ebe04ee38b08703244c1309cccc4f1bab",
+              "urls": [
+                "https://files.pythonhosted.org/packages/fe/1b/25b7cccd4519c0b23c2dd636ad39d381abf113085ce4f7bec2b0dc755eb1/pydantic_core-2.33.2-cp311-cp311-win_amd64.whl"
+              ]
+            }
+          },
+          "ncore_pip_deps_311_pydantic_core_sdist_7cb8bc36": {
+            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
+            "attributes": {
+              "dep_template": "@ncore_pip_deps//{name}:{target}",
+              "experimental_target_platforms": [
+                "cp311_linux_aarch64",
+                "cp311_linux_arm",
+                "cp311_linux_ppc",
+                "cp311_linux_s390x",
+                "cp311_linux_x86_64",
+                "cp311_osx_aarch64",
+                "cp311_osx_x86_64",
+                "cp311_windows_x86_64"
+              ],
+              "extra_pip_args": [
+                "--index-url",
+                "https://pypi.org/simple",
+                "--find-links",
+                "https://download.pytorch.org/whl/cu128/torch"
+              ],
+              "filename": "pydantic_core-2.33.2.tar.gz",
+              "python_interpreter_target": "@@rules_python++python+python_3_11_host//:python",
+              "repo": "ncore_pip_deps_311",
+              "requirement": "pydantic-core==2.33.2",
+              "sha256": "7cb8bc3605c29176e1b105350d2e6474142d7c1bd1d9327c4a9bdb46bf827acc",
+              "urls": [
+                "https://files.pythonhosted.org/packages/ad/88/5f2260bdfae97aabf98f1778d43f69574390ad787afb646292a638c923d4/pydantic_core-2.33.2.tar.gz"
+              ]
+            }
+          },
+          "ncore_pip_deps_311_pydantic_py3_none_any_802a6557": {
+            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
+            "attributes": {
+              "dep_template": "@ncore_pip_deps//{name}:{target}",
+              "experimental_target_platforms": [
+                "cp311_linux_aarch64",
+                "cp311_linux_arm",
+                "cp311_linux_ppc",
+                "cp311_linux_s390x",
+                "cp311_linux_x86_64",
+                "cp311_osx_aarch64",
+                "cp311_osx_x86_64",
+                "cp311_windows_x86_64"
+              ],
+              "filename": "pydantic-2.11.10-py3-none-any.whl",
+              "python_interpreter_target": "@@rules_python++python+python_3_11_host//:python",
+              "repo": "ncore_pip_deps_311",
+              "requirement": "pydantic==2.11.10",
+              "sha256": "802a655709d49bd004c31e865ef37da30b540786a46bfce02333e0e24b5fe29a",
+              "urls": [
+                "https://files.pythonhosted.org/packages/bd/1f/73c53fcbfb0b5a78f91176df41945ca466e71e9d9d836e5c522abda39ee7/pydantic-2.11.10-py3-none-any.whl"
+              ]
+            }
+          },
+          "ncore_pip_deps_311_pydantic_sdist_dc280f09": {
+            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
+            "attributes": {
+              "dep_template": "@ncore_pip_deps//{name}:{target}",
+              "experimental_target_platforms": [
+                "cp311_linux_aarch64",
+                "cp311_linux_arm",
+                "cp311_linux_ppc",
+                "cp311_linux_s390x",
+                "cp311_linux_x86_64",
+                "cp311_osx_aarch64",
+                "cp311_osx_x86_64",
+                "cp311_windows_x86_64"
+              ],
+              "extra_pip_args": [
+                "--index-url",
+                "https://pypi.org/simple",
+                "--find-links",
+                "https://download.pytorch.org/whl/cu128/torch"
+              ],
+              "filename": "pydantic-2.11.10.tar.gz",
+              "python_interpreter_target": "@@rules_python++python+python_3_11_host//:python",
+              "repo": "ncore_pip_deps_311",
+              "requirement": "pydantic==2.11.10",
+              "sha256": "dc280f0982fbda6c38fada4e476dc0a4f3aeaf9c6ad4c28df68a666ec3c61423",
+              "urls": [
+                "https://files.pythonhosted.org/packages/ae/54/ecab642b3bed45f7d5f59b38443dcb36ef50f85af192e6ece103dbfe9587/pydantic-2.11.10.tar.gz"
+              ]
+            }
+          },
           "ncore_pip_deps_311_pydata_sphinx_theme_py3_none_any_225331e8": {
             "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
             "attributes": {
@@ -12051,6 +12453,60 @@
               ]
             }
           },
+          "ncore_pip_deps_311_pypcd4_py3_none_any_4d39073e": {
+            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
+            "attributes": {
+              "dep_template": "@ncore_pip_deps//{name}:{target}",
+              "experimental_target_platforms": [
+                "cp311_linux_aarch64",
+                "cp311_linux_arm",
+                "cp311_linux_ppc",
+                "cp311_linux_s390x",
+                "cp311_linux_x86_64",
+                "cp311_osx_aarch64",
+                "cp311_osx_x86_64",
+                "cp311_windows_x86_64"
+              ],
+              "filename": "pypcd4-1.4.3-py3-none-any.whl",
+              "python_interpreter_target": "@@rules_python++python+python_3_11_host//:python",
+              "repo": "ncore_pip_deps_311",
+              "requirement": "pypcd4==1.4.3",
+              "sha256": "4d39073ef9f4945922561ad1b5246c008dfe110af2931dea963cafb1e0717d4f",
+              "urls": [
+                "https://files.pythonhosted.org/packages/7b/88/4ab71c769b64e3bf692254debb8476ebbaa0f9a847cdb8efe652960b0c2c/pypcd4-1.4.3-py3-none-any.whl"
+              ]
+            }
+          },
+          "ncore_pip_deps_311_pypcd4_sdist_dae09e3e": {
+            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
+            "attributes": {
+              "dep_template": "@ncore_pip_deps//{name}:{target}",
+              "experimental_target_platforms": [
+                "cp311_linux_aarch64",
+                "cp311_linux_arm",
+                "cp311_linux_ppc",
+                "cp311_linux_s390x",
+                "cp311_linux_x86_64",
+                "cp311_osx_aarch64",
+                "cp311_osx_x86_64",
+                "cp311_windows_x86_64"
+              ],
+              "extra_pip_args": [
+                "--index-url",
+                "https://pypi.org/simple",
+                "--find-links",
+                "https://download.pytorch.org/whl/cu128/torch"
+              ],
+              "filename": "pypcd4-1.4.3.tar.gz",
+              "python_interpreter_target": "@@rules_python++python+python_3_11_host//:python",
+              "repo": "ncore_pip_deps_311",
+              "requirement": "pypcd4==1.4.3",
+              "sha256": "dae09e3ef475a8b30ef8888e9feaf82f479759c421cb56c6533a006981b48c27",
+              "urls": [
+                "https://files.pythonhosted.org/packages/63/e3/6aba40c44a3cde9d7956bf860da6f66f91d08dd706620941513c76180431/pypcd4-1.4.3.tar.gz"
+              ]
+            }
+          },
           "ncore_pip_deps_311_pyquaternion_py3_none_any_e65f6e3f": {
             "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
             "attributes": {
@@ -12210,6 +12666,180 @@
               "sha256": "37dd54208da7e1cd875388217d5e00ebd4179249f90fb72437e91a35459a0ad3",
               "urls": [
                 "https://files.pythonhosted.org/packages/66/c0/0c8b6ad9f17a802ee498c46e004a0eb49bc148f2fd230864601a86dcf6db/python-dateutil-2.9.0.post0.tar.gz"
+              ]
+            }
+          },
+          "ncore_pip_deps_311_python_neo_lzf_cp311_cp311_macosx_10_9_universal2_8a1bce9f": {
+            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
+            "attributes": {
+              "dep_template": "@ncore_pip_deps//{name}:{target}",
+              "experimental_target_platforms": [
+                "cp311_linux_aarch64",
+                "cp311_linux_arm",
+                "cp311_linux_ppc",
+                "cp311_linux_s390x",
+                "cp311_linux_x86_64",
+                "cp311_osx_aarch64",
+                "cp311_osx_x86_64",
+                "cp311_windows_x86_64"
+              ],
+              "filename": "python_neo_lzf-0.3.5-cp311-cp311-macosx_10_9_universal2.whl",
+              "python_interpreter_target": "@@rules_python++python+python_3_11_host//:python",
+              "repo": "ncore_pip_deps_311",
+              "requirement": "python-neo-lzf==0.3.5",
+              "sha256": "8a1bce9ff658cf20c78aed181971b88aa5ffa93ab52885137d53f9904d43d4e6",
+              "urls": [
+                "https://files.pythonhosted.org/packages/15/84/8cf3605feccd40d98d278d852a9fedc183a29d347950fcf0de00877f56b5/python_neo_lzf-0.3.5-cp311-cp311-macosx_10_9_universal2.whl"
+              ]
+            }
+          },
+          "ncore_pip_deps_311_python_neo_lzf_cp311_cp311_manylinux_2_17_aarch64_963265a8": {
+            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
+            "attributes": {
+              "dep_template": "@ncore_pip_deps//{name}:{target}",
+              "experimental_target_platforms": [
+                "cp311_linux_aarch64",
+                "cp311_linux_arm",
+                "cp311_linux_ppc",
+                "cp311_linux_s390x",
+                "cp311_linux_x86_64",
+                "cp311_osx_aarch64",
+                "cp311_osx_x86_64",
+                "cp311_windows_x86_64"
+              ],
+              "filename": "python_neo_lzf-0.3.5-cp311-cp311-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl",
+              "python_interpreter_target": "@@rules_python++python+python_3_11_host//:python",
+              "repo": "ncore_pip_deps_311",
+              "requirement": "python-neo-lzf==0.3.5",
+              "sha256": "963265a869ffe6bd72962859d13fc97f744610cbf3aa42b09b1ec4138ad08979",
+              "urls": [
+                "https://files.pythonhosted.org/packages/e2/31/609a443a0a23c26aba049df2f00ca8de22af0d4fa4ee1d0f1c64f17c6ba4/python_neo_lzf-0.3.5-cp311-cp311-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl"
+              ]
+            }
+          },
+          "ncore_pip_deps_311_python_neo_lzf_cp311_cp311_manylinux_2_5_x86_64_cc917542": {
+            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
+            "attributes": {
+              "dep_template": "@ncore_pip_deps//{name}:{target}",
+              "experimental_target_platforms": [
+                "cp311_linux_aarch64",
+                "cp311_linux_arm",
+                "cp311_linux_ppc",
+                "cp311_linux_s390x",
+                "cp311_linux_x86_64",
+                "cp311_osx_aarch64",
+                "cp311_osx_x86_64",
+                "cp311_windows_x86_64"
+              ],
+              "filename": "python_neo_lzf-0.3.5-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl",
+              "python_interpreter_target": "@@rules_python++python+python_3_11_host//:python",
+              "repo": "ncore_pip_deps_311",
+              "requirement": "python-neo-lzf==0.3.5",
+              "sha256": "cc917542baa1cf38733f57dd4703d1f627bc9e391af44e63b8b557fa0b424457",
+              "urls": [
+                "https://files.pythonhosted.org/packages/3e/28/900b15eb541e3225eb0b0bbddef575336fa7500490b90094eae61e929996/python_neo_lzf-0.3.5-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl"
+              ]
+            }
+          },
+          "ncore_pip_deps_311_python_neo_lzf_cp311_cp311_musllinux_1_2_aarch64_031a2213": {
+            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
+            "attributes": {
+              "dep_template": "@ncore_pip_deps//{name}:{target}",
+              "experimental_target_platforms": [
+                "cp311_linux_aarch64",
+                "cp311_linux_arm",
+                "cp311_linux_ppc",
+                "cp311_linux_s390x",
+                "cp311_linux_x86_64",
+                "cp311_osx_aarch64",
+                "cp311_osx_x86_64",
+                "cp311_windows_x86_64"
+              ],
+              "filename": "python_neo_lzf-0.3.5-cp311-cp311-musllinux_1_2_aarch64.whl",
+              "python_interpreter_target": "@@rules_python++python+python_3_11_host//:python",
+              "repo": "ncore_pip_deps_311",
+              "requirement": "python-neo-lzf==0.3.5",
+              "sha256": "031a2213be5abe30b3bdf6e9dcf6e1c74f612435db5fd0a137dd640f4182d702",
+              "urls": [
+                "https://files.pythonhosted.org/packages/e1/96/57da914c2d9379b3a31000e01595346ad1ba1c847e78bce9e80e46e36f1f/python_neo_lzf-0.3.5-cp311-cp311-musllinux_1_2_aarch64.whl"
+              ]
+            }
+          },
+          "ncore_pip_deps_311_python_neo_lzf_cp311_cp311_musllinux_1_2_x86_64_b48d5847": {
+            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
+            "attributes": {
+              "dep_template": "@ncore_pip_deps//{name}:{target}",
+              "experimental_target_platforms": [
+                "cp311_linux_aarch64",
+                "cp311_linux_arm",
+                "cp311_linux_ppc",
+                "cp311_linux_s390x",
+                "cp311_linux_x86_64",
+                "cp311_osx_aarch64",
+                "cp311_osx_x86_64",
+                "cp311_windows_x86_64"
+              ],
+              "filename": "python_neo_lzf-0.3.5-cp311-cp311-musllinux_1_2_x86_64.whl",
+              "python_interpreter_target": "@@rules_python++python+python_3_11_host//:python",
+              "repo": "ncore_pip_deps_311",
+              "requirement": "python-neo-lzf==0.3.5",
+              "sha256": "b48d5847785191351b7b1c8d1ee42e853f0180c4d28c28a00248f60e16e3f20a",
+              "urls": [
+                "https://files.pythonhosted.org/packages/20/c7/b31aeba8f2861aa96beb6fde730f1abf0ca0cc052816f319983303018cdd/python_neo_lzf-0.3.5-cp311-cp311-musllinux_1_2_x86_64.whl"
+              ]
+            }
+          },
+          "ncore_pip_deps_311_python_neo_lzf_cp311_cp311_win_amd64_727175b7": {
+            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
+            "attributes": {
+              "dep_template": "@ncore_pip_deps//{name}:{target}",
+              "experimental_target_platforms": [
+                "cp311_linux_aarch64",
+                "cp311_linux_arm",
+                "cp311_linux_ppc",
+                "cp311_linux_s390x",
+                "cp311_linux_x86_64",
+                "cp311_osx_aarch64",
+                "cp311_osx_x86_64",
+                "cp311_windows_x86_64"
+              ],
+              "filename": "python_neo_lzf-0.3.5-cp311-cp311-win_amd64.whl",
+              "python_interpreter_target": "@@rules_python++python+python_3_11_host//:python",
+              "repo": "ncore_pip_deps_311",
+              "requirement": "python-neo-lzf==0.3.5",
+              "sha256": "727175b79a74079f9c48614bdaa64305cbd07a5b3b6c4bae7bac2d0c2d2fa2eb",
+              "urls": [
+                "https://files.pythonhosted.org/packages/3d/38/c8efcc057097b4a1461ed4dae3017e5eda71ef68437d296ad2ca5d78b010/python_neo_lzf-0.3.5-cp311-cp311-win_amd64.whl"
+              ]
+            }
+          },
+          "ncore_pip_deps_311_python_neo_lzf_sdist_77395b72": {
+            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
+            "attributes": {
+              "dep_template": "@ncore_pip_deps//{name}:{target}",
+              "experimental_target_platforms": [
+                "cp311_linux_aarch64",
+                "cp311_linux_arm",
+                "cp311_linux_ppc",
+                "cp311_linux_s390x",
+                "cp311_linux_x86_64",
+                "cp311_osx_aarch64",
+                "cp311_osx_x86_64",
+                "cp311_windows_x86_64"
+              ],
+              "extra_pip_args": [
+                "--index-url",
+                "https://pypi.org/simple",
+                "--find-links",
+                "https://download.pytorch.org/whl/cu128/torch"
+              ],
+              "filename": "python_neo_lzf-0.3.5.tar.gz",
+              "python_interpreter_target": "@@rules_python++python+python_3_11_host//:python",
+              "repo": "ncore_pip_deps_311",
+              "requirement": "python-neo-lzf==0.3.5",
+              "sha256": "77395b729d224c65b7b69c2b8ba89995f9bbc21bf7a8401865763c8fcafa90a7",
+              "urls": [
+                "https://files.pythonhosted.org/packages/b6/9c/b986e3addce3adc8cf714367dcf57c335d25384d308e9a992f32fd93f88e/python_neo_lzf-0.3.5.tar.gz"
               ]
             }
           },
@@ -15444,6 +16074,60 @@
               "sha256": "b23fc42ff6f6ef6954e4852c1fb512cdd18dbea03134f91f856a95ccc9461f78",
               "urls": [
                 "https://files.pythonhosted.org/packages/dc/74/1789779d91f1961fa9438e9a8710cdae6bd138c80d7303996933d117264a/typing_inspect-0.9.0.tar.gz"
+              ]
+            }
+          },
+          "ncore_pip_deps_311_typing_inspection_py3_none_any_4ed1cacb": {
+            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
+            "attributes": {
+              "dep_template": "@ncore_pip_deps//{name}:{target}",
+              "experimental_target_platforms": [
+                "cp311_linux_aarch64",
+                "cp311_linux_arm",
+                "cp311_linux_ppc",
+                "cp311_linux_s390x",
+                "cp311_linux_x86_64",
+                "cp311_osx_aarch64",
+                "cp311_osx_x86_64",
+                "cp311_windows_x86_64"
+              ],
+              "filename": "typing_inspection-0.4.2-py3-none-any.whl",
+              "python_interpreter_target": "@@rules_python++python+python_3_11_host//:python",
+              "repo": "ncore_pip_deps_311",
+              "requirement": "typing-inspection==0.4.2",
+              "sha256": "4ed1cacbdc298c220f1bd249ed5287caa16f34d44ef4e9c3d0cbad5b521545e7",
+              "urls": [
+                "https://files.pythonhosted.org/packages/dc/9b/47798a6c91d8bdb567fe2698fe81e0c6b7cb7ef4d13da4114b41d239f65d/typing_inspection-0.4.2-py3-none-any.whl"
+              ]
+            }
+          },
+          "ncore_pip_deps_311_typing_inspection_sdist_ba561c48": {
+            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
+            "attributes": {
+              "dep_template": "@ncore_pip_deps//{name}:{target}",
+              "experimental_target_platforms": [
+                "cp311_linux_aarch64",
+                "cp311_linux_arm",
+                "cp311_linux_ppc",
+                "cp311_linux_s390x",
+                "cp311_linux_x86_64",
+                "cp311_osx_aarch64",
+                "cp311_osx_x86_64",
+                "cp311_windows_x86_64"
+              ],
+              "extra_pip_args": [
+                "--index-url",
+                "https://pypi.org/simple",
+                "--find-links",
+                "https://download.pytorch.org/whl/cu128/torch"
+              ],
+              "filename": "typing_inspection-0.4.2.tar.gz",
+              "python_interpreter_target": "@@rules_python++python+python_3_11_host//:python",
+              "repo": "ncore_pip_deps_311",
+              "requirement": "typing-inspection==0.4.2",
+              "sha256": "ba561c48a67c5958007083d386c3295464928b01faa735ab8547c5692e87f464",
+              "urls": [
+                "https://files.pythonhosted.org/packages/55/e3/70399cb7dd41c10ac53367ae42139cf4b1ca5f36bb3dc6c9d33acdb43655/typing_inspection-0.4.2.tar.gz"
               ]
             }
           },
@@ -21724,6 +22408,7 @@
                 "absl_py": "{\"ncore_pip_deps_311_absl_py_py3_none_any_526a04ea\":[{\"filename\":\"absl_py-2.1.0-py3-none-any.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_absl_py_sdist_7820790e\":[{\"filename\":\"absl-py-2.1.0.tar.gz\",\"version\":\"3.11\"}]}",
                 "accessible_pygments": "{\"ncore_pip_deps_311_accessible_pygments_py3_none_any_88ae3211\":[{\"filename\":\"accessible_pygments-0.0.5-py3-none-any.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_accessible_pygments_sdist_40918d3e\":[{\"filename\":\"accessible_pygments-0.0.5.tar.gz\",\"version\":\"3.11\"}]}",
                 "alabaster": "{\"ncore_pip_deps_311_alabaster_py3_none_any_b46733c0\":[{\"filename\":\"alabaster-0.7.16-py3-none-any.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_alabaster_sdist_75a8b99c\":[{\"filename\":\"alabaster-0.7.16.tar.gz\",\"version\":\"3.11\"}]}",
+                "annotated_types": "{\"ncore_pip_deps_311_annotated_types_py3_none_any_1f02e8b4\":[{\"filename\":\"annotated_types-0.7.0-py3-none-any.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_annotated_types_sdist_aff07c09\":[{\"filename\":\"annotated_types-0.7.0.tar.gz\",\"version\":\"3.11\"}]}",
                 "anyio": "{\"ncore_pip_deps_311_anyio_py3_none_any_d4058288\":[{\"filename\":\"anyio-4.12.1-py3-none-any.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_anyio_sdist_41cfcc3a\":[{\"filename\":\"anyio-4.12.1.tar.gz\",\"version\":\"3.11\"}]}",
                 "asciitree": "{\"ncore_pip_deps_311_asciitree_sdist_4aa4b9b6\":[{\"filename\":\"asciitree-0.3.3.tar.gz\",\"version\":\"3.11\"}],\"ncore_pip_deps_38_asciitree_sdist_4aa4b9b6\":[{\"filename\":\"asciitree-0.3.3.tar.gz\",\"version\":\"3.8\"}]}",
                 "asttokens": "{\"ncore_pip_deps_311_asttokens_py3_none_any_15a3ebc0\":[{\"filename\":\"asttokens-3.0.1-py3-none-any.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_asttokens_sdist_71a4ee5d\":[{\"filename\":\"asttokens-3.0.1.tar.gz\",\"version\":\"3.11\"}]}",
@@ -21843,13 +22528,17 @@
                 "pyarrow": "{\"ncore_pip_deps_311_pyarrow_cp311_cp311_macosx_12_0_arm64_6f0147ee\":[{\"filename\":\"pyarrow-23.0.1-cp311-cp311-macosx_12_0_arm64.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pyarrow_cp311_cp311_macosx_12_0_x86_64_0ae6e17c\":[{\"filename\":\"pyarrow-23.0.1-cp311-cp311-macosx_12_0_x86_64.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pyarrow_cp311_cp311_manylinux_2_28_aarch64_fed70202\":[{\"filename\":\"pyarrow-23.0.1-cp311-cp311-manylinux_2_28_aarch64.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pyarrow_cp311_cp311_manylinux_2_28_x86_64_26d50dee\":[{\"filename\":\"pyarrow-23.0.1-cp311-cp311-manylinux_2_28_x86_64.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pyarrow_cp311_cp311_musllinux_1_2_aarch64_3c30143b\":[{\"filename\":\"pyarrow-23.0.1-cp311-cp311-musllinux_1_2_aarch64.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pyarrow_cp311_cp311_musllinux_1_2_x86_64_db2190fa\":[{\"filename\":\"pyarrow-23.0.1-cp311-cp311-musllinux_1_2_x86_64.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pyarrow_cp311_cp311_win_amd64_f00f993a\":[{\"filename\":\"pyarrow-23.0.1-cp311-cp311-win_amd64.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pyarrow_sdist_b8c5873e\":[{\"filename\":\"pyarrow-23.0.1.tar.gz\",\"version\":\"3.11\"}]}",
                 "pycocotools": "{\"ncore_pip_deps_311_pycocotools_cp311_cp311_macosx_10_9_universal2_81bdceeb\":[{\"filename\":\"pycocotools-2.0.11-cp311-cp311-macosx_10_9_universal2.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pycocotools_cp311_cp311_manylinux_2_17_aarch64_a1c05f91\":[{\"filename\":\"pycocotools-2.0.11-cp311-cp311-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pycocotools_cp311_cp311_manylinux_2_17_x86_64_18ba75ff\":[{\"filename\":\"pycocotools-2.0.11-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pycocotools_cp311_cp311_musllinux_1_2_aarch64_69341779\":[{\"filename\":\"pycocotools-2.0.11-cp311-cp311-musllinux_1_2_aarch64.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pycocotools_cp311_cp311_musllinux_1_2_x86_64_b6a07071\":[{\"filename\":\"pycocotools-2.0.11-cp311-cp311-musllinux_1_2_x86_64.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pycocotools_cp311_cp311_win_amd64_8e159232\":[{\"filename\":\"pycocotools-2.0.11-cp311-cp311-win_amd64.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pycocotools_sdist_34254d76\":[{\"filename\":\"pycocotools-2.0.11.tar.gz\",\"version\":\"3.11\"}]}",
                 "pycollada": "{\"ncore_pip_deps_311_pycollada_py3_none_any_636e6496\":[{\"filename\":\"pycollada-0.9.3-py3-none-any.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pycollada_sdist_c34d6dcf\":[{\"filename\":\"pycollada-0.9.3.tar.gz\",\"version\":\"3.11\"}]}",
+                "pydantic": "{\"ncore_pip_deps_311_pydantic_py3_none_any_802a6557\":[{\"filename\":\"pydantic-2.11.10-py3-none-any.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pydantic_sdist_dc280f09\":[{\"filename\":\"pydantic-2.11.10.tar.gz\",\"version\":\"3.11\"}]}",
+                "pydantic_core": "{\"ncore_pip_deps_311_pydantic_core_cp311_cp311_macosx_10_12_x86_64_4c5b0a57\":[{\"filename\":\"pydantic_core-2.33.2-cp311-cp311-macosx_10_12_x86_64.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pydantic_core_cp311_cp311_macosx_11_0_arm64_e799c050\":[{\"filename\":\"pydantic_core-2.33.2-cp311-cp311-macosx_11_0_arm64.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pydantic_core_cp311_cp311_manylinux_2_17_aarch64_dc46a01b\":[{\"filename\":\"pydantic_core-2.33.2-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pydantic_core_cp311_cp311_manylinux_2_17_armv7l_a144d4f7\":[{\"filename\":\"pydantic_core-2.33.2-cp311-cp311-manylinux_2_17_armv7l.manylinux2014_armv7l.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pydantic_core_cp311_cp311_manylinux_2_17_ppc64le_73cf6373\":[{\"filename\":\"pydantic_core-2.33.2-cp311-cp311-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pydantic_core_cp311_cp311_manylinux_2_17_s390x_3dc625f4\":[{\"filename\":\"pydantic_core-2.33.2-cp311-cp311-manylinux_2_17_s390x.manylinux2014_s390x.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pydantic_core_cp311_cp311_manylinux_2_17_x86_64_881b21b5\":[{\"filename\":\"pydantic_core-2.33.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pydantic_core_cp311_cp311_musllinux_1_1_aarch64_fe5b3218\":[{\"filename\":\"pydantic_core-2.33.2-cp311-cp311-musllinux_1_1_aarch64.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pydantic_core_cp311_cp311_musllinux_1_1_armv7l_bc7aee6f\":[{\"filename\":\"pydantic_core-2.33.2-cp311-cp311-musllinux_1_1_armv7l.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pydantic_core_cp311_cp311_musllinux_1_1_x86_64_235f45e5\":[{\"filename\":\"pydantic_core-2.33.2-cp311-cp311-musllinux_1_1_x86_64.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pydantic_core_cp311_cp311_win_amd64_1e063337\":[{\"filename\":\"pydantic_core-2.33.2-cp311-cp311-win_amd64.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pydantic_core_sdist_7cb8bc36\":[{\"filename\":\"pydantic_core-2.33.2.tar.gz\",\"version\":\"3.11\"}]}",
                 "pydata_sphinx_theme": "{\"ncore_pip_deps_311_pydata_sphinx_theme_py3_none_any_225331e8\":[{\"filename\":\"pydata_sphinx_theme-0.16.1-py3-none-any.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pydata_sphinx_theme_sdist_a08b7f0b\":[{\"filename\":\"pydata_sphinx_theme-0.16.1.tar.gz\",\"version\":\"3.11\"}]}",
                 "pygments": "{\"ncore_pip_deps_311_pygments_py3_none_any_9ea1544a\":[{\"filename\":\"pygments-2.19.1-py3-none-any.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pygments_sdist_61c16d2a\":[{\"filename\":\"pygments-2.19.1.tar.gz\",\"version\":\"3.11\"}]}",
                 "pynvvideocodec": "{\"ncore_pip_deps_311_pynvvideocodec_cp311_cp311_manylinux_2_28_aarch64_b8d9b47b\":[{\"filename\":\"pynvvideocodec-2.1.0-cp311-cp311-manylinux_2_28_aarch64.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pynvvideocodec_cp311_cp311_manylinux_2_28_x86_64_6d653240\":[{\"filename\":\"pynvvideocodec-2.1.0-cp311-cp311-manylinux_2_28_x86_64.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pynvvideocodec_cp311_cp311_win_amd64_ee5d2dc5\":[{\"filename\":\"pynvvideocodec-2.1.0-cp311-cp311-win_amd64.whl\",\"version\":\"3.11\"}]}",
                 "pyparsing": "{\"ncore_pip_deps_311_pyparsing_py3_none_any_506ff4f4\":[{\"filename\":\"pyparsing-3.2.1-py3-none-any.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pyparsing_sdist_61980854\":[{\"filename\":\"pyparsing-3.2.1.tar.gz\",\"version\":\"3.11\"}]}",
+                "pypcd4": "{\"ncore_pip_deps_311_pypcd4_py3_none_any_4d39073e\":[{\"filename\":\"pypcd4-1.4.3-py3-none-any.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pypcd4_sdist_dae09e3e\":[{\"filename\":\"pypcd4-1.4.3.tar.gz\",\"version\":\"3.11\"}]}",
                 "pyquaternion": "{\"ncore_pip_deps_311_pyquaternion_py3_none_any_e65f6e3f\":[{\"filename\":\"pyquaternion-0.9.9-py3-none-any.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pyquaternion_sdist_b1f61af2\":[{\"filename\":\"pyquaternion-0.9.9.tar.gz\",\"version\":\"3.11\"}]}",
                 "pytest": "{\"ncore_pip_deps_311_pytest_py3_none_any_50e16d95\":[{\"filename\":\"pytest-8.3.4-py3-none-any.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pytest_sdist_965370d0\":[{\"filename\":\"pytest-8.3.4.tar.gz\",\"version\":\"3.11\"}],\"ncore_pip_deps_38_pytest_py3_none_any_78bf1645\":[{\"filename\":\"pytest-7.4.0-py3-none-any.whl\",\"version\":\"3.8\"}],\"ncore_pip_deps_38_pytest_sdist_b4bf8c45\":[{\"filename\":\"pytest-7.4.0.tar.gz\",\"version\":\"3.8\"}]}",
                 "python_dateutil": "{\"ncore_pip_deps_311_python_dateutil_py2_none_any_a8b2bc7b\":[{\"filename\":\"python_dateutil-2.9.0.post0-py2.py3-none-any.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_python_dateutil_sdist_37dd5420\":[{\"filename\":\"python-dateutil-2.9.0.post0.tar.gz\",\"version\":\"3.11\"}]}",
+                "python_neo_lzf": "{\"ncore_pip_deps_311_python_neo_lzf_cp311_cp311_macosx_10_9_universal2_8a1bce9f\":[{\"filename\":\"python_neo_lzf-0.3.5-cp311-cp311-macosx_10_9_universal2.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_python_neo_lzf_cp311_cp311_manylinux_2_17_aarch64_963265a8\":[{\"filename\":\"python_neo_lzf-0.3.5-cp311-cp311-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_python_neo_lzf_cp311_cp311_manylinux_2_5_x86_64_cc917542\":[{\"filename\":\"python_neo_lzf-0.3.5-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_python_neo_lzf_cp311_cp311_musllinux_1_2_aarch64_031a2213\":[{\"filename\":\"python_neo_lzf-0.3.5-cp311-cp311-musllinux_1_2_aarch64.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_python_neo_lzf_cp311_cp311_musllinux_1_2_x86_64_b48d5847\":[{\"filename\":\"python_neo_lzf-0.3.5-cp311-cp311-musllinux_1_2_x86_64.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_python_neo_lzf_cp311_cp311_win_amd64_727175b7\":[{\"filename\":\"python_neo_lzf-0.3.5-cp311-cp311-win_amd64.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_python_neo_lzf_sdist_77395b72\":[{\"filename\":\"python_neo_lzf-0.3.5.tar.gz\",\"version\":\"3.11\"}]}",
                 "pytz": "{\"ncore_pip_deps_311_pytz_py2_none_any_89dd22dc\":[{\"filename\":\"pytz-2025.1-py2.py3-none-any.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pytz_sdist_c2db42be\":[{\"filename\":\"pytz-2025.1.tar.gz\",\"version\":\"3.11\"}]}",
                 "pyzmq": "{\"ncore_pip_deps_311_pyzmq_cp311_cp311_macosx_10_15_universal2_c0598838\":[{\"filename\":\"pyzmq-26.2.1-cp311-cp311-macosx_10_15_universal2.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pyzmq_cp311_cp311_macosx_10_9_x86_64_ed038a92\":[{\"filename\":\"pyzmq-26.2.1-cp311-cp311-macosx_10_9_x86_64.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pyzmq_cp311_cp311_manylinux_2_17_aarch64_9027a7fc\":[{\"filename\":\"pyzmq-26.2.1-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pyzmq_cp311_cp311_manylinux_2_17_x86_64_f0019cc8\":[{\"filename\":\"pyzmq-26.2.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pyzmq_cp311_cp311_manylinux_2_28_x86_64_f19dae58\":[{\"filename\":\"pyzmq-26.2.1-cp311-cp311-manylinux_2_28_x86_64.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pyzmq_cp311_cp311_musllinux_1_1_aarch64_f5eeeb82\":[{\"filename\":\"pyzmq-26.2.1-cp311-cp311-musllinux_1_1_aarch64.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pyzmq_cp311_cp311_musllinux_1_1_x86_64_817fcd33\":[{\"filename\":\"pyzmq-26.2.1-cp311-cp311-musllinux_1_1_x86_64.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pyzmq_cp311_cp311_win_amd64_ef29630f\":[{\"filename\":\"pyzmq-26.2.1-cp311-cp311-win_amd64.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_pyzmq_sdist_17d72a74\":[{\"filename\":\"pyzmq-26.2.1.tar.gz\",\"version\":\"3.11\"}]}",
                 "referencing": "{\"ncore_pip_deps_311_referencing_py3_none_any_d53ae300\":[{\"filename\":\"referencing-0.34.0-py3-none-any.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_referencing_sdist_5773bd84\":[{\"filename\":\"referencing-0.34.0.tar.gz\",\"version\":\"3.11\"}]}",
@@ -21892,6 +22581,7 @@
                 "triton": "{\"ncore_pip_deps_311_triton_cp311_cp311_manylinux_2_27_x86_64_3161a2bf\":[{\"filename\":\"triton-3.3.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl\",\"version\":\"3.11\"}]}",
                 "typing_extensions": "{\"ncore_pip_deps_311_typing_extensions_py3_none_any_04e5ca03\":[{\"filename\":\"typing_extensions-4.12.2-py3-none-any.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_typing_extensions_sdist_1a7ead55\":[{\"filename\":\"typing_extensions-4.12.2.tar.gz\",\"version\":\"3.11\"}],\"ncore_pip_deps_38_typing_extensions_py3_none_any_440d5dd3\":[{\"filename\":\"typing_extensions-4.7.1-py3-none-any.whl\",\"version\":\"3.8\"}],\"ncore_pip_deps_38_typing_extensions_sdist_b75ddc26\":[{\"filename\":\"typing_extensions-4.7.1.tar.gz\",\"version\":\"3.8\"}]}",
                 "typing_inspect": "{\"ncore_pip_deps_311_typing_inspect_py3_none_any_9ee6fc59\":[{\"filename\":\"typing_inspect-0.9.0-py3-none-any.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_typing_inspect_sdist_b23fc42f\":[{\"filename\":\"typing_inspect-0.9.0.tar.gz\",\"version\":\"3.11\"}],\"ncore_pip_deps_38_typing_inspect_py3_none_any_9ee6fc59\":[{\"filename\":\"typing_inspect-0.9.0-py3-none-any.whl\",\"version\":\"3.8\"}],\"ncore_pip_deps_38_typing_inspect_sdist_b23fc42f\":[{\"filename\":\"typing_inspect-0.9.0.tar.gz\",\"version\":\"3.8\"}]}",
+                "typing_inspection": "{\"ncore_pip_deps_311_typing_inspection_py3_none_any_4ed1cacb\":[{\"filename\":\"typing_inspection-0.4.2-py3-none-any.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_typing_inspection_sdist_ba561c48\":[{\"filename\":\"typing_inspection-0.4.2.tar.gz\",\"version\":\"3.11\"}]}",
                 "tzdata": "{\"ncore_pip_deps_311_tzdata_py2_none_any_7e127113\":[{\"filename\":\"tzdata-2025.1-py2.py3-none-any.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_tzdata_sdist_24894909\":[{\"filename\":\"tzdata-2025.1.tar.gz\",\"version\":\"3.11\"}]}",
                 "universal_pathlib": "{\"ncore_pip_deps_311_universal_pathlib_py3_none_any_ff10a86e\":[{\"filename\":\"universal_pathlib-0.3.6-py3-none-any.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_universal_pathlib_sdist_d8640454\":[{\"filename\":\"universal_pathlib-0.3.6.tar.gz\",\"version\":\"3.11\"}],\"ncore_pip_deps_38_universal_pathlib_py3_none_any_700dec2b\":[{\"filename\":\"universal_pathlib-0.2.6-py3-none-any.whl\",\"version\":\"3.8\"}],\"ncore_pip_deps_38_universal_pathlib_sdist_50817aae\":[{\"filename\":\"universal_pathlib-0.2.6.tar.gz\",\"version\":\"3.8\"}]}",
                 "urllib3": "{\"ncore_pip_deps_311_urllib3_py3_none_any_1cee9ad3\":[{\"filename\":\"urllib3-2.3.0-py3-none-any.whl\",\"version\":\"3.11\"}],\"ncore_pip_deps_311_urllib3_sdist_f8c5449b\":[{\"filename\":\"urllib3-2.3.0.tar.gz\",\"version\":\"3.11\"}]}",
@@ -21912,6 +22602,7 @@
                 "absl_py",
                 "accessible_pygments",
                 "alabaster",
+                "annotated_types",
                 "anyio",
                 "asciitree",
                 "asttokens",
@@ -22031,13 +22722,17 @@
                 "pyarrow",
                 "pycocotools",
                 "pycollada",
+                "pydantic",
+                "pydantic_core",
                 "pydata_sphinx_theme",
                 "pygments",
                 "pynvvideocodec",
                 "pyparsing",
+                "pypcd4",
                 "pyquaternion",
                 "pytest",
                 "python_dateutil",
+                "python_neo_lzf",
                 "pytz",
                 "pyzmq",
                 "referencing",
@@ -22080,6 +22775,7 @@
                 "triton",
                 "typing_extensions",
                 "typing_inspect",
+                "typing_inspection",
                 "tzdata",
                 "universal_pathlib",
                 "urllib3",

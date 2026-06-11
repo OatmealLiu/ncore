@@ -1,0 +1,26 @@
+{
+    "dist_fcn": "center_distance",
+    "dist_ths": [6.0],
+    "dist_th_tp": 6.0,
+    "_comment_range_bins": "Please make sure the first in the range_bins is the overall range, in the following example starts at 0m and ends at 250m",
+    "range_bins": [
+        [0.0, 250.0],
+        [0.0, 50.0],
+        [50.0, 150.0],
+        [150.0, 250.0]
+    ],
+    "overall_range_id": 0,
+    "min_recall": 0.1,
+    "min_precision": 0.1,
+    "mean_ap_weight": 5,
+    "ego_front_dist": 7.14,
+    "ego_rear_dist": -15.244,
+    "roi_dict": {
+        "eval": true,
+        "roi": {
+        "xrange": [-150.0, 250.0],
+        "yrange": [-100.0, 100.0],
+        "zrange": [-12.0, 12.0]
+        }
+    }
+}
