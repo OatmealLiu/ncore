@@ -179,6 +179,17 @@ def relative_angle(
 
     two_pi = 2 * np.pi
 
+    # Reduce the reference at the same precision as the input tensor. Otherwise a
+    # float32 `angle_rad` array is reduced with `% 2pi` in float32 while the
+    # scalar `ref_angle_rad` is promoted to float64, so the same value reduces to
+    # results differing by ~1 ULP. For ref == angle_rad[i] this makes the
+    # relative angle wrap to ~2*pi instead of 0 -- breaking, e.g., the strict
+    # monotonicity check on a structured lidar model's column azimuths whose
+    # reference column happens to reduce near the +/-pi boundary.
+    if isinstance(angle_rad, np.ndarray):
+        ref_angle_rad = angle_rad.dtype.type(ref_angle_rad)
+        two_pi = angle_rad.dtype.type(two_pi)
+
     # Check for wrap-around condition
     wrap_around_flag = abs(angle_rad - ref_angle_rad) >= two_pi
 

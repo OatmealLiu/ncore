@@ -22,7 +22,6 @@
 -r requirements_colmap.in
 -r requirements_nuscenes.in
 -r requirements_pai.in
--r requirements_man_truckscenes.in
 
 # Public API restrictions for 3.11
 # torch 2.7+ supports numpy 2.x natively, no constraint needed

@@ -19,7 +19,7 @@ import numpy as np
 
 from numpy.polynomial.polynomial import Polynomial
 
-from ncore.impl.data.util import closest_index_sorted, compute_max_angle_with_monotonicity
+from ncore.impl.data.util import closest_index_sorted, compute_max_angle_with_monotonicity, relative_angle
 
 
 class TestClosestIndexSorted(unittest.TestCase):
@@ -104,3 +104,45 @@ class TestComputeMaxAngleWithMonotonicity(unittest.TestCase):
         for t in thetas:
             dr = d_poly(t)
             self.assertGreaterEqual(dr, 0.0, f"Derivative negative at theta={t}")
+
+
+class TestRelativeAngle(unittest.TestCase):
+    """Tests for relative_angle, including float32 precision robustness."""
+
+    def test_self_reference_is_zero_float64(self) -> None:
+        """The relative angle of the reference element to itself is exactly 0."""
+        angles = np.array([1.0, 0.5, 0.0, -0.5], dtype=np.float64)
+        rel = relative_angle(angles[0], angles, "cw")
+        self.assertEqual(float(rel.relative_angle_rad[0]), 0.0)
+
+    def test_self_reference_is_zero_float32_near_pi(self) -> None:
+        """Self-reference must be 0 even for a float32 array starting near -pi.
+
+        Regression: relative_angle used to reduce the (float32) reference
+        scalar with `% 2pi` in float64 while reducing the (float32) array in
+        float32. The two reductions of the same value disagreed by ~1 ULP, so
+        the self-distance at element 0 wrapped to ~2*pi instead of 0. With a
+        strictly-decreasing CW sweep this made np.diff(relative_angle) negative
+        at index 0 and broke monotonicity checks (e.g. the structured lidar
+        model constructor) for otherwise-valid azimuths.
+        """
+        n = 4340
+        span = 2.0 * np.pi * (1.0 - 1e-4)
+        # Strictly-decreasing CW sweep whose first element sits just above -pi.
+        azimuths = (-np.pi + 1e-3 - np.linspace(0.0, span, n)).astype(np.float32)
+
+        rel = relative_angle(azimuths[0], azimuths, "cw")
+
+        self.assertEqual(float(rel.relative_angle_rad[0]), 0.0)
+        # A strictly-decreasing CW sweep has strictly-increasing relative angles.
+        self.assertTrue(np.all(np.diff(rel.relative_angle_rad) > 0))
+        self.assertTrue(np.all(~rel.wrap_around_flag))
+
+    def test_matches_float64_reference(self) -> None:
+        """float32 and float64 inputs agree to float32 precision."""
+        n = 256
+        span = 2.0 * np.pi * (1.0 - 1e-3)
+        az64 = -np.pi + 1e-2 - np.linspace(0.0, span, n)
+        rel64 = relative_angle(az64[0], az64, "cw")
+        rel32 = relative_angle(az64.astype(np.float32)[0], az64.astype(np.float32), "cw")
+        np.testing.assert_allclose(rel32.relative_angle_rad.astype(np.float64), rel64.relative_angle_rad, atol=1e-5)

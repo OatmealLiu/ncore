@@ -8,23 +8,13 @@ Converts [nuScenes](https://www.nuscenes.org/) dataset scenes to NCore V4 format
 - Python packages: `nuscenes-devkit`, `pyquaternion`
 
 ## Usage
-```bash
-nuscenes_root="/lustre/fs11/portfolios/nvr/projects/nvr_dvl_research/datasets/nuscenes"
-ncore_out="/lustre/fs12/portfolios/nvr/projects/nvr_dvl_research/users/mingxuanl/datasets/ncoreV3/nuscenes"
-
-wget -O /lustre/fs12/portfolios/nvr/projects/nvr_dvl_research/users/mingxuanl/softwares/bazel https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64
-sudo chmod +x /usr/local/bin/bazel
-
-```
-
 
 ```bash
 bazel run //tools/data_converter/nuscenes -- \
-    --root-dir "/lustre/fs11/portfolios/nvr/projects/nvr_dvl_research/datasets/nuscenes" \
-    --output-dir "/lustre/fs12/portfolios/nvr/projects/nvr_dvl_research/users/mingxuanl/datasets/ncoreV4/nuscenes" \
+    --root-dir /path/to/nuscenes \
+    --output-dir /path/to/output \
     nuscenes-v4 \
-    --version v1.0-trainval \
-    --scene-name scene-0007
+    --version v1.0-trainval
 ```
 
 ### Convert a single scene by token
@@ -59,11 +49,15 @@ bazel run //tools/data_converter/nuscenes -- \
 | `--store-type` | itar | Output store format (itar or directory) |
 | `--profile` | separate-sensors | Component group assignment profile |
 | `--sequence-meta/--no-sequence-meta` | enabled | Generate sequence meta JSON |
-| `--lidar-model-source` | nominal | Model derivation: `nominal` (from HDL-32E spec) or `empirical` (from data) |
+| `--lidar-model-source` | empirical | Model derivation: `empirical` (from data) or `nominal` (from HDL-32E spec) |
 | `--lidar-model-resolution` | 4 | Model column resolution factor (1/2/4). Higher = finer alignment. |
 | `--lidar-model-optimization-passes` | 1 | Multi-frame optimization iterations (0 to disable) |
 
-Recommended for best quality: `--lidar-model-source nominal --lidar-model-resolution 4 --lidar-model-optimization-passes 1`
+Recommended for best quality: `--lidar-model-source empirical --lidar-model-resolution 4 --lidar-model-optimization-passes 1`.
+Across v1.0-mini scenes plus a trainval sample, `empirical` reproduces the point cloud
+~4-15x more accurately at far range (~0.04 deg vs ~0.16-0.67 deg mean angular error) with a
+smaller systematic azimuth bias, so it is the default. Use `nominal` only when a
+data-independent model is required.
 
 ## Sensor Assumptions
 
@@ -74,10 +68,11 @@ Recommended for best quality: `--lidar-model-source nominal --lidar-model-resolu
   motion-compensated; the converter decompensates them to raw per-point-time
   measurements. Per-point timestamps are derived from the 32-beam column structure.
   A structured lidar model is stored as intrinsics with configurable derivation:
+  - *Empirical* (`--lidar-model-source empirical`, default): derived from a decompensated
+    reference frame with analytical blending for data-poor beams. Best accuracy.
   - *Nominal* (`--lidar-model-source nominal`): from HDL-32E spec (uniform azimuths,
-    spec elevations, analytical firing offsets). No circular data dependency.
-  - *Empirical* (`--lidar-model-source empirical`): derived from a decompensated
-    reference frame with analytical blending for data-poor beams.
+    spec elevations, analytical firing offsets). No circular data dependency, but
+    lower fidelity than empirical.
   - *Resolution upsampling* (`--lidar-model-resolution 4`): interpolates the model
     to 4x column resolution, reducing alignment quantization from ~0.10 to ~0.03 deg.
   - *Optimization* (`--lidar-model-optimization-passes 1`): multi-frame median

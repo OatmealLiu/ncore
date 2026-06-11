@@ -47,8 +47,6 @@ error from ~0.096 deg to ~0.03 deg.
 
 from __future__ import annotations
 
-import logging
-
 from dataclasses import dataclass
 from typing import Literal, Optional
 
@@ -56,9 +54,6 @@ import numpy as np
 
 from ncore.impl.common.transformations import MotionCompensator
 from ncore.impl.data.types import RowOffsetStructuredSpinningLidarModelParameters
-
-
-_logger = logging.getLogger(__name__)
 
 
 # --- Data structures -----------------------------------------------------------
@@ -116,67 +111,6 @@ def _grouped_median(
         if end - start >= min_count:
             result[g] = np.median(sorted_values[start:end])
     return result
-
-
-def _enforce_monotone_azimuths(
-    column_azimuths: np.ndarray,
-    n_columns: int,
-    spinning_direction: str,
-) -> np.ndarray:
-    """Force column azimuths to be strictly monotone in the spinning direction with a span < 2*pi.
-
-    The ``RowOffsetStructuredSpinningLidarModelParameters`` invariant
-    (ncore/impl/data/types.py) requires ``relative_angle(col[0], col, direction)`` to be
-    strictly increasing. Because ``relative_angle`` is taken modulo 2*pi, that holds iff the
-    azimuths are strictly monotone in the spinning direction AND the cumulative span
-    (``col[0] - col[-1]`` for cw) stays strictly below a full revolution (2*pi).
-
-    Enforcement happens in the continuous (``np.unwrap``'d) domain, which provides two
-    guarantees the previous "subtract 2*pi from anything above col[0], then clamp" logic did
-    not:
-
-    * No single column is ever displaced by a full 2*pi. A noisy early column that a
-      per-column correction nudged just past ``col[0]`` is pulled back by one ``min_step``
-      instead of being flipped to the opposite end of the revolution (which then cascaded
-      through the unbounded clamp loop and pushed the total span past 2*pi).
-    * The total span is capped just below 2*pi, so endpoint-correction drift can never make
-      the model exceed one revolution.
-
-    Inputs that are already valid (strictly monotone, span < 2*pi) are returned unchanged: the
-    per-column step never fires and the span cap never triggers. Converted scenes that did not
-    hit the bug therefore produce identical models.
-
-    Returns float64 *continuous* azimuths (not re-wrapped to (-pi, pi]); callers cast to
-    float32. ``relative_angle`` reduces its inputs modulo 2*pi, so an unwrapped range is fine,
-    and the downstream consumers use the azimuths only via ``cos``/``sin`` (2*pi-periodic).
-    """
-    min_step = 2.0 * np.pi / n_columns / 100.0
-    unwrapped = np.unwrap(np.asarray(column_azimuths, dtype=np.float64))
-
-    # Signed cumulative offset from the first column. It must grow from 0 for both spin
-    # directions (cw decreases the azimuth with column index, ccw increases it).
-    sign = 1.0 if spinning_direction == "cw" else -1.0
-    offset = sign * (unwrapped[0] - unwrapped)
-
-    # Enforce a strictly increasing offset with a minimum per-column gap.
-    for i in range(1, len(offset)):
-        if offset[i] <= offset[i - 1] + min_step:
-            offset[i] = offset[i - 1] + min_step
-
-    # Keep the full revolution strictly below 2*pi. Only fires on degenerate models whose
-    # per-column corrections drifted past one revolution (the cases that previously crashed);
-    # a benign no-op for well-behaved models.
-    max_span = 2.0 * np.pi - min_step
-    if offset[-1] > max_span:
-        _logger.warning(
-            "Structured lidar column azimuth span reached %.6f rad (>= 2*pi); compressing to "
-            "%.6f rad. The per-column corrections for this frame were degenerate.",
-            offset[-1],
-            max_span,
-        )
-        offset *= max_span / offset[-1]
-
-    return unwrapped[0] - sign * offset
 
 
 # --- Composable steps ----------------------------------------------------------
@@ -382,6 +316,95 @@ def compute_frame_timestamps(
     return timestamps.astype(np.uint64)
 
 
+def enforce_cw_monotonic(azimuths_rad: np.ndarray, n_columns: int) -> np.ndarray:
+    """Force per-column azimuths to be strictly monotonic for CW rotation.
+
+    The ncore lidar model (RowOffsetStructuredSpinningLidarModelParameters)
+    requires the relative angle between consecutive columns to be strictly
+    positive in the spinning direction (see types.py __post_init__). For CW
+    rotation this means the azimuths, after unwrapping and a global shift that
+    places element 0 at the maximum, must be strictly decreasing AND span
+    strictly less than one full revolution (2*pi). If the span reached 2*pi the
+    most-negative columns would alias, modulo 2*pi, back onto the early columns
+    and the relative-angle sequence would wrap, breaking strict monotonicity.
+
+    Real estimated azimuths are not perfectly uniform: noise, interpolation and
+    float32 quantization can make adjacent columns equal or slightly out of
+    order. After 4x upsampling many neighbours become near-degenerate, so a
+    large fraction of pairs need repair. This helper repairs such pairs by
+    clamping each violating column a minimum step below its predecessor.
+
+    The repair runs in float64 but the result is returned as float32 (the dtype
+    the model stores), so the strict-monotonicity guarantee holds for the value
+    callers actually use. To survive the cast the minimum step must satisfy two
+    competing constraints:
+      1. Be at least a few float32 ULPs at the data's magnitude, so the gap is
+         not rounded away to an equal pair by the cast.
+      2. Be small enough that, even if every column is clamped, the accumulated
+         span stays strictly below 2*pi (otherwise the wrap-around aliasing
+         above re-breaks the invariant).
+    We pick the float32-safe floor and additionally cap it by the remaining
+    budget to 2*pi. As a final safety net, if the strictly-decreasing sequence
+    still spans >= 2*pi we proportionally compress it to just under 2*pi.
+
+    Args:
+        azimuths_rad: Column azimuths in radians (shape [N], float). Operated on
+            in float64 internally for numerical headroom.
+        n_columns: Nominal number of columns (used only for a sensible default
+            step size; the float32-safe floor dominates for dense models).
+
+    Returns:
+        Strictly-decreasing (CW) column azimuths as a float32 array spanning
+        strictly less than 2*pi.
+    """
+    az = np.unwrap(azimuths_rad.astype(np.float64))
+    # Re-wrap to (-pi, pi].
+    az = ((az + np.pi) % (2 * np.pi)) - np.pi
+    # Global shift so element 0 is the maximum (CW => strictly decreasing).
+    az[az > az[0]] -= 2 * np.pi
+
+    n = len(az)
+    if n < 2:
+        return az.astype(np.float32)
+
+    # Float32-safe floor: a few ULPs at the largest magnitude present, so the
+    # gap is preserved when the result is cast to float32 below.
+    max_mag = float(max(abs(az[0]), abs(az[-1]), np.pi))
+    f32_floor = 8.0 * float(np.spacing(np.float32(max_mag)))
+
+    # Span budget: total clamping must not push the span to 2*pi. Reserve a
+    # small margin so the wrapped relative-angle stays strictly positive.
+    span_budget = 2.0 * np.pi * (1.0 - 1e-6) - (az[0] - az[-1])
+    if span_budget > 0:
+        # Worst case: every one of the (n-1) steps is a clamp.
+        budget_step = span_budget / (n - 1)
+        min_step = max(f32_floor, min(2.0 * np.pi / n_columns / 100.0, budget_step))
+    else:
+        # Already at/over a full revolution before clamping: use the float32
+        # floor and rely on the proportional compression below.
+        min_step = f32_floor
+
+    # Clamp adjacent violations. We clamp whenever the gap to the predecessor is
+    # smaller than min_step -- not only when non-decreasing -- because a
+    # positive but sub-float32-epsilon gap would collapse to an equal pair after
+    # the float32 cast.
+    for i in range(1, n):
+        if az[i] > az[i - 1] - min_step:
+            az[i] = az[i - 1] - min_step
+
+    # Safety net: if the strictly-decreasing result still spans >= 2*pi (only
+    # possible when the genuine data already covered nearly a full revolution),
+    # compress proportionally about element 0 to fit just under 2*pi while
+    # preserving strict monotonicity.
+    span = az[0] - az[-1]
+    max_span = 2.0 * np.pi * (1.0 - 1e-6)
+    if span >= max_span:
+        scale = max_span / span
+        az = az[0] + (az - az[0]) * scale
+
+    return az.astype(np.float32)
+
+
 def upsample_model(
     model_params: RowOffsetStructuredSpinningLidarModelParameters,
     resolution_factor: int,
@@ -415,12 +438,12 @@ def upsample_model(
         native_unwrapped,
     )
 
-    # Enforce strict monotonicity and a span < 2*pi without ever displacing a column by a full
-    # 2*pi (handles both spin directions). Interpolation of an already-monotone model is itself
-    # monotone, so this is a no-op for well-behaved inputs.
-    upsampled_az = _enforce_monotone_azimuths(upsampled_unwrapped, n_upsampled, model_params.spinning_direction).astype(
-        np.float32
-    )
+    # Preserve monotonicity: for CW rotation, force strictly decreasing.
+    if model_params.spinning_direction == "cw":
+        upsampled_az = enforce_cw_monotonic(upsampled_unwrapped, n_upsampled)
+    else:
+        # Re-wrap to (-pi, pi].
+        upsampled_az = ((upsampled_unwrapped + np.pi) % (2 * np.pi) - np.pi).astype(np.float32)
 
     return RowOffsetStructuredSpinningLidarModelParameters(
         spinning_frequency_hz=model_params.spinning_frequency_hz,
@@ -494,11 +517,29 @@ def optimize_model(
         return model_params
 
     for _ in range(n_iterations):
-        # Per-column correction
+        # Per-column correction.
+        #
+        # The correction is split into a global component (applied to every
+        # column) and a per-column local deviation (applied only to columns with
+        # enough observations). This matters for high-resolution (upsampled)
+        # models where the observed sweeps cover only a fraction of the columns:
+        # if the model has a systematic phase offset relative to the data (e.g.
+        # ~pi for some scenes), the naive per-column update shifts only the
+        # observed columns and leaves the unobserved ones behind, tearing the
+        # azimuth ramp apart (span > 2*pi, non-monotonic) and producing a model
+        # that no longer reconstructs the point cloud. Removing the global offset
+        # from all columns first keeps the ramp consistent; the local residual
+        # then refines the columns we actually observed.
         predicted = column_azimuths[cat_cols] + row_offsets[cat_rows]
         residual = np.arctan2(np.sin(cat_azimuths - predicted), np.cos(cat_azimuths - predicted))
-        col_correction = _grouped_median(residual, cat_cols, n_columns, min_count=3)
-        column_azimuths += col_correction
+
+        # Global offset: circular mean of all residuals (robust to wrap).
+        global_correction = float(np.arctan2(np.sin(residual).mean(), np.cos(residual).mean()))
+        # Local per-column deviation from the global offset, only where observed.
+        local_residual = np.arctan2(np.sin(residual - global_correction), np.cos(residual - global_correction))
+        local_correction = _grouped_median(local_residual, cat_cols, n_columns, min_count=3)
+
+        column_azimuths += global_correction + local_correction
 
         # Per-row correction
         predicted = column_azimuths[cat_cols] + row_offsets[cat_rows]
@@ -506,11 +547,11 @@ def optimize_model(
         row_correction = _grouped_median(residual, cat_rows, n_rows, min_count=3)
         row_offsets += row_correction
 
-    # Monotonicity enforcement: after the per-column corrections, adjacent columns may swap
-    # order or a noisy early column may overshoot col[0]. Enforce strict monotonicity with a
-    # span < 2*pi so the result satisfies the RowOffsetStructuredSpinningLidarModelParameters
-    # invariant (works for both spin directions).
-    column_azimuths = _enforce_monotone_azimuths(column_azimuths, n_columns, model_params.spinning_direction)
+    # Monotonicity enforcement for CW rotation: after per-column corrections,
+    # adjacent columns may swap order. Clamp violations using a minimum step
+    # of 1% of one column width (physically: ~0.003 deg for 1085-col model).
+    if model_params.spinning_direction == "cw":
+        column_azimuths = enforce_cw_monotonic(column_azimuths, n_columns)
 
     return RowOffsetStructuredSpinningLidarModelParameters(
         spinning_frequency_hz=model_params.spinning_frequency_hz,
@@ -723,7 +764,7 @@ def align_frame(
         # Step 5: Decompensate
         xyz_decomp_full = motion_compensator.motion_decompensate_points(
             sensor_id=sensor_id,
-            xyz_sensorend=xyz_mc,
+            xyz_reftime=xyz_mc,
             timestamp_us=point_timestamps,
             frame_start_timestamp_us=frame_start_us,
             frame_end_timestamp_us=frame_end_us,
@@ -748,7 +789,7 @@ def align_frame(
     final_timestamps = compute_frame_timestamps(model_col.astype(np.int64), n_model_cols, frame_start_us, frame_end_us)
     xyz_decompensated = motion_compensator.motion_decompensate_points(
         sensor_id=sensor_id,
-        xyz_sensorend=xyz_mc[valid_mask],
+        xyz_reftime=xyz_mc[valid_mask],
         timestamp_us=final_timestamps,
         frame_start_timestamp_us=frame_start_us,
         frame_end_timestamp_us=frame_end_us,
@@ -884,9 +925,16 @@ def derive_model_from_decompensated(
         valid_az_unwrapped = np.unwrap(col_az[ref_valid])
         col_az = np.interp(np.arange(n_cols, dtype=np.float64), valid_indices, valid_az_unwrapped)
 
-    column_azimuths_rad = col_az.astype(np.float32)
-    # Normalize: force strictly decreasing for CW
-    column_azimuths_rad[column_azimuths_rad > column_azimuths_rad[0]] -= np.float32(2 * np.pi)
+    # Enforce strict monotonicity for CW rotation. The raw per-column estimate is
+    # not perfectly uniform, so after the float32 cast adjacent columns can be
+    # equal (diff == 0) or slightly out of order (diff < 0), which trips the
+    # strict-monotonicity assertion in the ncore model constructor.
+    # enforce_cw_monotonic repairs such near-degenerate pairs and returns float32.
+    if spinning_direction == "cw":
+        column_azimuths_rad = enforce_cw_monotonic(col_az, n_cols)
+    else:
+        column_azimuths_rad = col_az.astype(np.float32)
+        column_azimuths_rad[column_azimuths_rad > column_azimuths_rad[0]] -= np.float32(2 * np.pi)
 
     # Per-row azimuth offsets: measure each row's offset from the column azimuths
     center_col = n_cols // 2
