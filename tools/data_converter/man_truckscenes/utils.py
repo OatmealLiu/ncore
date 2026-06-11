@@ -68,6 +68,10 @@ RADAR_MAP: Dict[str, str] = {
 # the 12 detection classes car/truck/bus/trailer/other_vehicle/pedestrian/motorcycle/
 # bicycle/traffic_cone/barrier/animal/traffic_sign. Raw categories absent from this map
 # (e.g. emergency vehicles, bicycle racks, strollers, trains, debris) are dropped.
+# Deviation from the devkit taxonomy: the recording vehicle's own rigidly-attached
+# trailer (vehicle.ego_trailer) is kept as a DISTINCT 'ego_trailer' class rather than
+# folded into 'trailer', so the ego trailer can be told apart from other vehicles'
+# trailers. Whether it is emitted at all is gated by the --keep-ego-trailer flag.
 TRUCKSCENES_CATEGORY_MAP: Dict[str, str] = {
     "animal": "animal",
     "movable_object.barrier": "barrier",
@@ -84,7 +88,7 @@ TRUCKSCENES_CATEGORY_MAP: Dict[str, str] = {
     "human.pedestrian.police_officer": "pedestrian",
     "movable_object.trafficcone": "traffic_cone",
     "static_object.traffic_sign": "traffic_sign",
-    "vehicle.ego_trailer": "trailer",
+    "vehicle.ego_trailer": "ego_trailer",
     "vehicle.trailer": "trailer",
     "vehicle.truck": "truck",
 }

@@ -58,7 +58,7 @@ bazel run //tools/data_converter/man_truckscenes:man_truckscenes -- \
 | `--store-type` | itar | Output store format (`itar` or `directory`) |
 | `--profile` | separate-sensors | Component group assignment profile |
 | `--keyframes-only` / `--all-sweeps` | all-sweeps | Convert only ~2 Hz keyframes vs the full sweep cadence |
-| `--keep-ego-trailer` / `--drop-ego-trailer` | keep | Keep the recording vehicle's own trailer as a `trailer` cuboid |
+| `--keep-ego-trailer` / `--drop-ego-trailer` | keep | Keep the recording vehicle's own trailer as a distinct `ego_trailer` cuboid (not `trailer`) |
 | `--sequence-meta` / `--no-sequence-meta` | enabled | Emit sequence-meta JSON |
 
 The shared `--no-cameras` / `--camera-id` / `--no-lidars` / `--lidar-id` / `--no-radars` /
