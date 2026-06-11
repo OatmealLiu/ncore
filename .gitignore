@@ -15,3 +15,5 @@ bazel-*
 
 *.swp
 *.swo
+
+tmp_reports/*
