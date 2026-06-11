@@ -286,6 +286,22 @@ def load_depth_npy_gz(path: str) -> np.ndarray:
 
 # --- Class mapping (from the vendored devkit metainfo.json) --------------------
 
+# Rename the devkit's coarse category names (the `mapped_categories` keys in metainfo.json)
+# to the NCore snake_case class_id convention shared with the other dataset converters
+# (e.g. `other_vehicle`). The TruckDrive coarse class SET is kept exactly as-is -- only the
+# string spelling is normalised (CamelCase / hyphen -> lower_snake_case).
+_COARSE_CLASS_RENAME: Dict[str, str] = {
+    "Bike": "bike",
+    "Passenger-Car": "passenger_car",
+    "Person": "person",
+    "RoadObstruction": "road_obstruction",
+    "SemiTruck-Cab": "semi_truck_cab",
+    "SemiTruck-Trailer": "semi_truck_trailer",
+    "Vehicle": "vehicle",
+    "TrafficSign": "traffic_sign",
+    "EmergencyVehicle": "emergency_vehicle",
+}
+
 
 @cache
 def _metainfo() -> Dict:
@@ -305,5 +321,8 @@ def _fine_to_class_name() -> Dict[str, str]:
 
 
 def class_name_for_label(fine_label: str) -> Optional[str]:
-    """Coarse class name for a fine label, or None if it maps to ignore / is unknown."""
-    return _fine_to_class_name().get(fine_label)
+    """Coarse class_id (NCore snake_case convention) for a fine label, or None if it maps to ignore / is unknown."""
+    coarse = _fine_to_class_name().get(fine_label)
+    if coarse is None:
+        return None
+    return _COARSE_CLASS_RENAME.get(coarse, coarse)

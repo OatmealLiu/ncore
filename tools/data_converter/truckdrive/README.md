@@ -61,7 +61,10 @@ Plus the shared `--no-cameras` / `--camera-id` / `--no-lidars` / `--lidar-id` / 
   `amplitude`, `azimuth/elevation`, the velocity vector, and `sensor_id` in `generic_data`.
 - **Cuboids**: 3D boxes from `bounding_boxes/*.json` in the `velodyne` frame (a static
   `velodyne → rig` pose is stored so they can be interpreted), mapped to 9 coarse classes via the
-  vendored `metainfo.json` label mapping; ignore/ego classes (id `-1`) are dropped.
+  vendored `metainfo.json` label mapping; ignore/ego classes (id `-1`) are dropped. The coarse
+  class names are normalised to the NCore snake_case convention: `bike`, `passenger_car`,
+  `person`, `road_obstruction`, `semi_truck_cab`, `semi_truck_trailer`, `vehicle`, `traffic_sign`,
+  `emergency_vehicle`.
 
 ## Deferred to V2 (not in V1)
 
