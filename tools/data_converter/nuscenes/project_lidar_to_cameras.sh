@@ -11,8 +11,15 @@
 # lidar_top is a 360 deg roof lidar, so it projects usefully onto ALL 6 cameras. It loops
 # CAMERAS x LIDARS and writes:  <PROJ_DIR>/<camera>/<lidar>/*.png
 #
+# By default (LIDAR_MODEL=1) it passes --lidar-model, so the projected points are RECONSTRUCTED
+# from the structured spinning-lidar model (per-column azimuths x measured distance) -- this is
+# what actually validates the lidar model (e.g. the azimuth-span fix). Set LIDAR_MODEL=0 to
+# project the native stored rays instead (validates only extrinsics/intrinsics/poses, not the
+# model). The native vs model comparison is itself a useful check: large divergence => bad model.
+#
 # Usage (runs anywhere with the scene + repo + bazel; a GPU is used if present):
-#   tools/data_converter/nuscenes/project_lidar_to_cameras.sh
+#   tools/data_converter/nuscenes/project_lidar_to_cameras.sh                 # model-reconstructed (default)
+#   LIDAR_MODEL=0 tools/data_converter/nuscenes/project_lidar_to_cameras.sh   # native rays
 #   SCENE_NAME=scene-0007 CAMERAS="camera_front" START=0 STOP=10 \
 #     tools/data_converter/nuscenes/project_lidar_to_cameras.sh
 #
@@ -32,6 +39,14 @@ DEVICE="${DEVICE:-cuda}"        # cuda if a GPU is present, else set DEVICE=cpu
 POSE="${POSE:-mean}"            # cameras are global-shutter, so 'mean' (single pose) is apt
 POINT_SIZE="${POINT_SIZE:-2.0}"
 RANGE_CYCLE="${RANGE_CYCLE:-25.0}"
+# LIDAR_MODEL=1 (default): reconstruct points FROM the structured spinning lidar model
+# (model azimuths/elevations x measured distance) -- this exercises the lidar model itself
+# (the azimuth-span fix). LIDAR_MODEL=0: project the native stored rays (does NOT test the
+# model; validates only extrinsics/intrinsics/poses). nuScenes has a structured model; the
+# truck datasets (ray bundles, no model) must use 0.
+LIDAR_MODEL="${LIDAR_MODEL:-1}"
+LM_FLAG="--lidar-model"
+[[ "$LIDAR_MODEL" == "0" ]] && LM_FLAG="--no-lidar-model"
 TARGET="//tools:ncore_project_pc_to_img"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -51,7 +66,8 @@ LOG_DIR="$PROJ_DIR/_logs"
 mkdir -p "$LOG_DIR"
 
 echo "Scene : $SCENE_NAME"
-echo "Frames: [$START,$STOP) step $STEP   device=$DEVICE pose=$POSE"
+echo "Frames: [$START,$STOP) step $STEP   device=$DEVICE pose=$POSE   $LM_FLAG"
+echo "        ($([ "$LM_FLAG" = "--lidar-model" ] && echo 'reconstructs points FROM the structured lidar model -- validates the model' || echo 'native stored rays -- does NOT exercise the lidar model'))"
 echo "Out   : $PROJ_DIR"
 echo "Building $TARGET (first build pulls torch; may take a few minutes) ..."
 if ! bazel build "$TARGET" 2>&1 | tail -n 5; then
@@ -67,6 +83,7 @@ for cam in $CAMERAS; do
         if bazel run "$TARGET" -- \
                 --source-id "$lid" --camera-id "$cam" \
                 --device "$DEVICE" --pose "$POSE" \
+                "$LM_FLAG" \
                 --start-frame "$START" --stop-frame "$STOP" --step-frame "$STEP" \
                 --point-size "$POINT_SIZE" --range-cycle "$RANGE_CYCLE" \
                 --output-dir "$out" \
