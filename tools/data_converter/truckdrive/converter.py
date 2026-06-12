@@ -108,11 +108,13 @@ class TruckDriveConverter4(FileBasedDataConverter):
     - Radar: Continental conti542 joint under radar/conti542/joint_radars/detections (.bin
       float64, 33 cols). Stored as a ray bundle; radial velocity + rcs/amplitude/velocity-vectors
       carried in generic_data.
-    - Ego motion: single 'rig' frame (the devkit 'vehicle' frame). Dynamic rig->world from
+    - Ego motion: single 'rig' frame anchored to the devkit 'velodyne' frame (x-forward, y-left,
+      z-UP -- the devkit's canonical/annotation frame; NOT the devkit 'vehicle' frame, which is
+      y-right/z-down and would flip the scene upside down). Dynamic rig->world from
       poses/gt_trajectory.txt (scene-local), anchored via static world->world_global. Per-sensor
       static extrinsics resolved from the per-scene tf tree (calibrations/) via BFS.
-    - Cuboids: 3D boxes from annotations/bounding_boxes/*.json in the 'velodyne' frame (a static
-      velodyne->rig pose is stored so they can be interpreted); coarse class from metainfo.
+    - Cuboids: 3D boxes from annotations/bounding_boxes/*.json in the 'velodyne' frame (== rig,
+      so the stored velodyne->rig pose is identity); coarse class from metainfo.
     """
 
     def __init__(self, config: TruckDriveConverter4Config) -> None:
@@ -152,11 +154,13 @@ class TruckDriveConverter4(FileBasedDataConverter):
             raise AssertionError(f"Scene {scene_name}: gt_trajectory timestamps are not strictly increasing.")
 
         # gt_trajectory poses are anchored to the Aeva reference lidar frame
-        # (lidar_aeva_forward_center_wide -> world), NOT the vehicle frame (the devkit composes
-        # them with a velodyne->aeva extrinsic). Re-anchor to the vehicle/rig frame so the
-        # sensor->rig->world chain is correct: T_rig_world = T_aeva_world @ T_vehicle_to_aeva.
-        t_vehicle_to_aeva = utils.find_transform(tf_graph, utils.RIG_NODE, utils.LIDAR_SENSORS["aeva"]["node"])
-        t_rig_world_all = t_aeva_world_all @ t_vehicle_to_aeva
+        # (lidar_aeva_forward_center_wide -> world). Re-anchor to the NCore rig frame
+        # (RIG_NODE == 'velodyne', x-forward/y-left/z-UP -- see utils.RIG_NODE) so the
+        # sensor->rig->world chain is correct AND the world is z-up: T_rig_world =
+        # T_aeva_world @ T_rig_to_aeva. (Anchoring to the devkit 'vehicle' frame instead would
+        # make world z-down -- vehicle is a y-right/z-down NED frame.)
+        t_rig_to_aeva = utils.find_transform(tf_graph, utils.RIG_NODE, utils.LIDAR_SENSORS["aeva"]["node"])
+        t_rig_world_all = t_aeva_world_all @ t_rig_to_aeva
 
         # Anchor to the first pose (the trajectory is scene-local; keeps the established
         # two-frame world/world_global convention and float32-safe local coordinates).

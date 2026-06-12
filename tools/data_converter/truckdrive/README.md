@@ -43,12 +43,14 @@ Plus the shared `--no-cameras` / `--camera-id` / `--no-lidars` / `--lidar-id` / 
 
 ## What it stores (V1)
 
-- **Poses**: dynamic `rig → world` from `poses/gt_trajectory.txt` (scene-local). NB the raw trajectory is
-  anchored to the **Aeva reference lidar** frame (`lidar_aeva_forward_center_wide → world`), so it is
-  re-anchored to the vehicle/`rig` frame via the tf tree (`T_rig_world = T_aeva_world @ T_vehicle→aeva`)
-  before storing; a static `world → world_global` carries the first-pose anchor. Static
-  `<sensor> → rig` extrinsics are resolved from the per-scene tf tree (`calib_tf_tree_full.json`) by
-  BFS to the `vehicle` frame.
+- **Poses**: dynamic `rig → world` from `poses/gt_trajectory.txt` (scene-local). The NCore `rig` is
+  anchored to the devkit **`velodyne`** frame (x-forward, y-left, **z-up** — the devkit's canonical
+  display + annotation frame). **Not** the devkit `vehicle` frame, which is y-right/**z-down** (NED-style)
+  and would render the whole scene upside down. The raw trajectory is anchored to the **Aeva** frame
+  (`lidar_aeva_forward_center_wide → world`), so it is re-anchored via the tf tree
+  (`T_rig_world = T_aeva_world @ T_velodyne→aeva`) before storing; a static `world → world_global`
+  carries the first-pose anchor. Static `<sensor> → rig` extrinsics are resolved from the per-scene
+  tf tree (`calib_tf_tree_full.json`) by BFS to the `velodyne` frame.
 - **Cameras (11)**: RGB JPEGs (`camera/leopard/<pos>/images`). Model from the calib `distortion_model`:
   `plumb_bob` → `OpenCVPinhole`, `equidistant` → `OpenCVFisheye` (zero distortion; images are
   delivered rectified to their model). Global shutter; intrinsics from the projection matrix `P`.

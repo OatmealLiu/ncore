@@ -53,8 +53,12 @@ from upath import UPath
 TF_TREE_FILE = "calib_tf_tree_full.json"
 TRAJECTORY_FILE = "poses/gt_trajectory.txt"
 BOUNDING_BOXES_DIR = "annotations/bounding_boxes"
-RIG_NODE = "vehicle"  # the devkit ego/vehicle frame == NCore "rig"
-ANNOTATION_NODE = "velodyne"  # frame the 3D bounding boxes are expressed in
+# NCore "rig" is anchored to the devkit's `velodyne` frame: it is x-forward, y-left, z-UP
+# (standard), it is the devkit's canonical display frame, and it is the frame the 3D boxes are
+# expressed in. The devkit's `vehicle` frame is x-forward, y-RIGHT, z-DOWN (NED-style) -- using
+# it as the rig flips the whole scene upside down (z points to the ground), so we do NOT use it.
+RIG_NODE = "velodyne"
+ANNOTATION_NODE = "velodyne"  # frame the 3D bounding boxes are expressed in (== rig)
 
 # <sync>_<normalized-ns-timestamp> stem, e.g. "0061_3072067608".
 _STEM_RE = re.compile(r"^(?P<sync>\d+)_(?P<ts>\d+)$")
