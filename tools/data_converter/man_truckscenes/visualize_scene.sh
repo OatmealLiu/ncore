@@ -21,7 +21,7 @@
 
 set -uo pipefail
 
-OUTPUT_DIR="${OUTPUT_DIR:-/localhome/local-mingxuanl/miuspace/datasets/ncoreV4/man_truckscenes}"
+OUTPUT_DIR="${OUTPUT_DIR:-/localhome/local-mingxuanl/miuspace/datasets/ncoreV4/man_truckscenes_fix_validation}"
 SCENE_NAME="${SCENE_NAME:-}"
 PORT="${PORT:-8080}"
 TARGET="//tools/ncore_vis"
