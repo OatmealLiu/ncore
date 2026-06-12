@@ -25,6 +25,11 @@ tf tree (``calib_tf_tree_full.json``).
 V1 scope: 11 RGB cameras, 3 Ouster + 1 Aeva lidars, 1 Continental radar, ego poses, and
 3D cuboids. The accumulated GT-depth maps and lane-line polylines are NOT yet converted
 (no schema-correct V4 destination resolved); see README for the deferral rationale.
+
+By default each scene is trimmed to the per-scene time span where 3D cuboid annotations
+exist ([first_box_ts, last_box_ts]); the unlabeled head/tail (TruckDrive labels only a
+central span of each scene) is dropped. The window is derived from each scene's own box
+timestamps, so it adapts to any scene duration. Pass --full-scene to keep all frames.
 """
 
 from __future__ import annotations
@@ -83,6 +88,10 @@ class TruckDriveConverter4Config(FileBasedDataConverterConfig):
     store_type: Literal["itar", "directory"] = "itar"
     component_group_profile: Literal["default", "separate-sensors", "separate-all"] = "separate-sensors"
     store_sequence_meta: bool = True
+    # Convert only the per-scene time span where 3D cuboid annotations exist (drop the
+    # unlabeled head/tail). The window is derived from each scene's own first/last box
+    # timestamps, so it adapts to any scene duration. Set False to keep all sensor frames.
+    trim_to_annotated_window: bool = True
 
 
 class TruckDriveConverter4(FileBasedDataConverter):
@@ -123,7 +132,10 @@ class TruckDriveConverter4(FileBasedDataConverter):
         self.component_group_profile = config.component_group_profile
         self.store_type = config.store_type
         self.store_sequence_meta = config.store_sequence_meta
+        self.trim_to_annotated_window = config.trim_to_annotated_window
         self._scene_name = config.scene_name
+        # Per-scene annotated time window [lo, hi] us, set in convert_sequence; None = full scene.
+        self._keep_window_us: Optional[tuple[int, int]] = None
         self.logger = logging.getLogger(__name__)
 
     @staticmethod
@@ -162,11 +174,6 @@ class TruckDriveConverter4(FileBasedDataConverter):
         t_rig_to_aeva = utils.find_transform(tf_graph, utils.RIG_NODE, utils.LIDAR_SENSORS["aeva"]["node"])
         t_rig_world_all = t_aeva_world_all @ t_rig_to_aeva
 
-        # Anchor to the first pose (the trajectory is scene-local; keeps the established
-        # two-frame world/world_global convention and float32-safe local coordinates).
-        t_world_world_global = t_rig_world_all[0].copy()
-        t_rig_world_relative = (se3_inverse(t_world_world_global) @ t_rig_world_all).astype(np.float32)
-
         # --- Active sensors (intersect maps with present-on-disk + CLI selection) ----
         present_cameras = [p for p in utils.CAMERA_POSITIONS if (scene_dir / utils.camera_images_dir(p)).is_dir()]
         present_lidars = [k for k, v in utils.LIDAR_SENSORS.items() if (scene_dir / v["dir"]).is_dir()]
@@ -175,11 +182,38 @@ class TruckDriveConverter4(FileBasedDataConverter):
         lidar_ids = self.get_active_lidar_ids(present_lidars)
         radar_ids = self.get_active_radar_ids(present_radars)
 
-        # --- Sequence interval + padded pose timeline -------------------------
-        seq_start_us, seq_end_us = self._compute_sequence_interval(
-            scene_dir, camera_ids, lidar_ids, radar_ids, pose_timestamps_us
-        )
+        # --- Annotated-window trim (per-scene; TruckDrive labels only a central span) ----
+        # Derived from THIS scene's own first/last cuboid timestamps, so it adapts to any
+        # scene duration. None => keep the full scene. All sensor decoders + the sequence
+        # interval honour self._keep_window_us.
+        self._keep_window_us = self._annotated_window(scene_dir) if self.trim_to_annotated_window else None
+
+        # --- Sequence interval -------------------------------------------------
+        if self._keep_window_us is not None:
+            a_lo, a_hi = self._keep_window_us
+            seq_start_us = max(0, a_lo - SEQUENCE_INTERVAL_MARGIN_US)
+            seq_end_us = a_hi + SEQUENCE_INTERVAL_MARGIN_US
+        else:
+            seq_start_us, seq_end_us = self._compute_sequence_interval(
+                scene_dir, camera_ids, lidar_ids, radar_ids, pose_timestamps_us
+            )
         sequence_timestamp_interval_us = HalfClosedInterval.from_start_end(seq_start_us, seq_end_us)
+
+        # --- Ego pose track: clip to the window (when trimming), anchor, pad ----
+        if self._keep_window_us is not None:
+            t_rig_world_all, pose_timestamps_us = self._clip_poses_to_interval(
+                t_rig_world_all, pose_timestamps_us, seq_start_us, seq_end_us
+            )
+            if len(pose_timestamps_us) < 2:
+                raise AssertionError(
+                    f"Scene {scene_name}: < 2 ego poses within the annotated window "
+                    f"[{seq_start_us}, {seq_end_us}] us."
+                )
+
+        # Anchor to the first (kept) pose (the trajectory is scene-local; keeps the established
+        # two-frame world/world_global convention and float32-safe local coordinates).
+        t_world_world_global = t_rig_world_all[0].copy()
+        t_rig_world_relative = (se3_inverse(t_world_world_global) @ t_rig_world_all).astype(np.float32)
         t_rig_world_relative, pose_timestamps_us = self._pad_pose_timeline(
             t_rig_world_relative, pose_timestamps_us, seq_start_us, seq_end_us
         )
@@ -272,7 +306,7 @@ class TruckDriveConverter4(FileBasedDataConverter):
         fold_frame_times(utils.list_frames(scene_dir / utils.BOUNDING_BOXES_DIR, ".json"))
         for lid in lidar_ids:
             spec = utils.LIDAR_SENSORS[lid]
-            frames = utils.list_frames(scene_dir / spec["dir"], ".bin")
+            frames = self._scene_frames(scene_dir / spec["dir"], ".bin")
             fold_frame_times(frames)
             # per-point extrema from the first & last frame (frames are time-ordered)
             for _, ts_ns, path in dict.fromkeys([frames[0], frames[-1]]) if frames else []:
@@ -300,6 +334,55 @@ class TruckDriveConverter4(FileBasedDataConverter):
         return poses, timestamps_us
 
     # -------------------------------------------------------------------------
+    # Annotated-window trim helpers
+    # -------------------------------------------------------------------------
+
+    def _annotated_window(self, scene_dir) -> Optional[tuple[int, int]]:
+        """[first, last] cuboid timestamp (us) for this scene, or None if no usable span.
+
+        Computed per-scene from the scene's own bounding-box file timestamps, so it adapts to
+        each scene's duration. Falls back to None (full scene) if a scene has <2 annotations.
+        """
+        box_frames = utils.list_frames(scene_dir / utils.BOUNDING_BOXES_DIR, ".json")
+        if len(box_frames) < 2:
+            self.logger.warning(
+                f"Annotated-window trim requested but scene has {len(box_frames)} annotation frame(s); "
+                "converting the full scene."
+            )
+            return None
+        lo = int(box_frames[0][1] // 1000)  # frames are time-sorted by list_frames
+        hi = int(box_frames[-1][1] // 1000)
+        if hi <= lo:
+            self.logger.warning("Annotated-window trim: degenerate annotation span; converting the full scene.")
+            return None
+        self.logger.info(
+            f"Annotated window: [{lo}, {hi}] us ({(hi - lo) / 1e6:.1f}s) from {len(box_frames)} annotation "
+            "frames; dropping the unlabeled head/tail."
+        )
+        return (lo, hi)
+
+    @staticmethod
+    def _clip_poses_to_interval(
+        poses: np.ndarray, timestamps_us: np.ndarray, lo_us: int, hi_us: int
+    ) -> tuple[np.ndarray, np.ndarray]:
+        """Keep poses within [lo, hi] us plus one bracketing sample each side (clean boundary interp)."""
+        ts = timestamps_us.astype(np.int64)
+        inside = np.nonzero((ts >= lo_us) & (ts <= hi_us))[0]
+        if inside.size == 0:
+            return poses[:0], timestamps_us[:0]
+        i0 = max(0, int(inside[0]) - 1)
+        i1 = min(len(poses), int(inside[-1]) + 2)
+        return poses[i0:i1], timestamps_us[i0:i1]
+
+    def _scene_frames(self, dir_path, suffix):
+        """utils.list_frames, restricted to the annotated window (self._keep_window_us) when trimming."""
+        frames = utils.list_frames(dir_path, suffix)
+        if self._keep_window_us is None:
+            return frames
+        lo, hi = self._keep_window_us
+        return [f for f in frames if lo <= (f[1] // 1000) <= hi]
+
+    # -------------------------------------------------------------------------
     # Lidars (ray bundles; no structured model)
     # -------------------------------------------------------------------------
 
@@ -323,7 +406,7 @@ class TruckDriveConverter4(FileBasedDataConverter):
     def _decode_lidars(self, scene_dir, tf_graph, store_writer, poses_writer, component_groups, lidar_ids) -> None:
         for ncore_id in lidar_ids:
             spec = utils.LIDAR_SENSORS[ncore_id]
-            frames = utils.list_frames(scene_dir / spec["dir"], ".bin")
+            frames = self._scene_frames(scene_dir / spec["dir"], ".bin")
             if not frames:
                 self.logger.warning(f"No frames for lidar {ncore_id}")
                 continue
@@ -407,7 +490,7 @@ class TruckDriveConverter4(FileBasedDataConverter):
         camera_ids,
     ) -> None:
         for ncore_id in camera_ids:
-            frames = utils.list_frames(scene_dir / utils.camera_images_dir(ncore_id), ".jpg")
+            frames = self._scene_frames(scene_dir / utils.camera_images_dir(ncore_id), ".jpg")
             if not frames:
                 self.logger.warning(f"No frames for camera {ncore_id}")
                 continue
@@ -506,7 +589,7 @@ class TruckDriveConverter4(FileBasedDataConverter):
     def _decode_radars(self, scene_dir, tf_graph, store_writer, poses_writer, component_groups, radar_ids) -> None:
         for ncore_id in radar_ids:
             spec = utils.RADAR_SENSORS[ncore_id]
-            frames = utils.list_frames(scene_dir / spec["dir"], ".bin")
+            frames = self._scene_frames(scene_dir / spec["dir"], ".bin")
             if not frames:
                 self.logger.warning(f"No frames for radar {ncore_id}")
                 continue
@@ -631,7 +714,9 @@ class TruckDriveConverter4(FileBasedDataConverter):
                         reference_frame_id=utils.ANNOTATION_NODE,
                         reference_frame_timestamp_us=timestamp_us,
                         bbox3=bbox3,
-                        source=LabelSource.GT_ANNOTATION,
+                        # LabelSource.EXTERNAL for dataset-provided GT boxes, matching the
+                        # nuScenes/waymo/man_truckscenes convention.
+                        source=LabelSource.EXTERNAL,
                     )
                 )
             if geometry_failures:
@@ -675,6 +760,14 @@ class TruckDriveConverter4(FileBasedDataConverter):
 )
 @click.option(
     "store_sequence_meta", "--sequence-meta/--no-sequence-meta", default=True, help="Generate sequence meta-data JSON?"
+)
+@click.option(
+    "trim_to_annotated_window",
+    "--annotated-window-only/--full-scene",
+    default=True,
+    show_default=True,
+    help="Convert only the per-scene span where 3D cuboid annotations exist (drop the unlabeled "
+    "head/tail); --full-scene keeps every sensor frame.",
 )
 @click.pass_context
 def truckdrive_v4(ctx, scene_glob, scene_name, **kwargs):

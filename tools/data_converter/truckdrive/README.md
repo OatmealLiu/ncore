@@ -37,11 +37,18 @@ quick smoke test.
 | `--store-type` | itar | Output store format (`itar` or `directory`) |
 | `--profile` | separate-sensors | Component group assignment profile |
 | `--sequence-meta` / `--no-sequence-meta` | enabled | Emit sequence-meta JSON |
+| `--annotated-window-only` / `--full-scene` | annotated-window-only | Convert only the per-scene span where 3D cuboid annotations exist (drop the unlabeled head/tail); `--full-scene` keeps every frame |
 
 Plus the shared `--no-cameras` / `--camera-id` / `--no-lidars` / `--lidar-id` / `--no-radars` /
 `--radar-id` sensor-selection options.
 
 ## What it stores (V1)
+
+By default the converter trims each scene to the **per-scene time span where 3D cuboid annotations
+exist** (`[first_box_ts, last_box_ts]`) and drops the unlabeled head/tail — TruckDrive labels only a
+central span of each scene. The window is computed from each scene's own box timestamps, so it adapts
+to any scene duration; sensor frames, the pose track, and the sequence interval are all restricted to
+it. Pass `--full-scene` to keep every frame instead.
 
 - **Poses**: dynamic `rig → world` from `poses/gt_trajectory.txt` (scene-local). The NCore `rig` is
   anchored to the devkit **`velodyne`** frame (x-forward, y-left, **z-up** — the devkit's canonical
