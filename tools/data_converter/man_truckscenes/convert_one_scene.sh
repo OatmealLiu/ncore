@@ -8,19 +8,18 @@
 # and converts keyframes only by default (fast; set KEYFRAMES_ONLY=0 for the full sweep
 # cadence). Run on a node that has both the dataset (lustre) and a warm bazel.
 #
+# Output goes to a SEPARATE validation dir by default (not the production tree), and the full
+# conversion log is saved to <out>/_conversion_logs/<scene>.log. Override OUTPUT_DIR to convert
+# into the production tree instead.
+#
 # Usage:
 #   tools/data_converter/man_truckscenes/convert_one_scene.sh
 #   SCENE_NAME=scene-<...> KEYFRAMES_ONLY=0 tools/data_converter/man_truckscenes/convert_one_scene.sh
-#
-# NOTE: the first build needs the pip lock regenerated to include pypcd4 (one-time):
-#   bazel run //deps/pip:requirements_3_11
-#   bazel build //... --lockfile_mode=update --nobuild
-# (see this directory's README.md).
 
 set -uo pipefail
 
 ROOT_DIR="${ROOT_DIR:-/lustre/fs11/portfolios/nvr/projects/nvr_dvl_research/datasets/man-truckscenes}"
-OUTPUT_DIR="${OUTPUT_DIR:-/lustre/fs12/portfolios/nvr/projects/nvr_dvl_research/users/mingxuanl/datasets/ncoreV4/man_truckscenes}"
+OUTPUT_DIR="${OUTPUT_DIR:-/lustre/fs12/portfolios/nvr/projects/nvr_dvl_research/users/mingxuanl/datasets/ncoreV4/man_truckscenes_fix_validation}"
 VERSION="${VERSION:-v1.2-trainval}"
 KEYFRAMES_ONLY="${KEYFRAMES_ONLY:-1}"
 TARGET="//tools/data_converter/man_truckscenes:man_truckscenes"
@@ -48,12 +47,17 @@ fi
 KF_FLAG="--keyframes-only"
 [[ "$KEYFRAMES_ONLY" == "0" ]] && KF_FLAG="--all-sweeps"
 
+LOG_DIR="${OUTPUT_DIR%/}/_conversion_logs"
+mkdir -p "$LOG_DIR"
+LOG="$LOG_DIR/${SCENE_NAME}.log"
+
 echo "Converting ONE scene:"
 echo "  root  = $ROOT_DIR"
 echo "  out   = $OUTPUT_DIR"
 echo "  ver   = $VERSION"
 echo "  scene = $SCENE_NAME"
 echo "  mode  = $KF_FLAG"
+echo "  log   = $LOG"
 echo
 
 bazel run "$TARGET" -- \
@@ -62,13 +66,13 @@ bazel run "$TARGET" -- \
     man-truckscenes-v4 \
     --version "$VERSION" \
     --scene-name "$SCENE_NAME" \
-    "$KF_FLAG"
+    "$KF_FLAG" 2>&1 | tee "$LOG"
 
-status=$?
+status=${PIPESTATUS[0]}
 echo
 if [[ $status -eq 0 ]]; then
-    echo "OK -> $OUTPUT_DIR/$SCENE_NAME"
+    echo "OK -> $OUTPUT_DIR/$SCENE_NAME   (log: $LOG)"
 else
-    echo "FAILED (exit $status)"
+    echo "FAILED (exit $status)   (log: $LOG)"
 fi
 exit $status
