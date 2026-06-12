@@ -365,13 +365,17 @@ class TruckDriveConverter4(FileBasedDataConverter):
     def _clip_poses_to_interval(
         poses: np.ndarray, timestamps_us: np.ndarray, lo_us: int, hi_us: int
     ) -> tuple[np.ndarray, np.ndarray]:
-        """Keep poses within [lo, hi] us plus one bracketing sample each side (clean boundary interp)."""
+        """Keep only poses whose timestamp lies within the sequence interval [lo, hi] us.
+
+        store_dynamic_pose requires every sample to be inside the sequence interval, so we must
+        NOT keep bracketing samples outside it. _pad_pose_timeline then extends the track to the
+        exact interval boundaries via constant-velocity extrapolation (same as the non-trim path).
+        """
         ts = timestamps_us.astype(np.int64)
         inside = np.nonzero((ts >= lo_us) & (ts <= hi_us))[0]
         if inside.size == 0:
             return poses[:0], timestamps_us[:0]
-        i0 = max(0, int(inside[0]) - 1)
-        i1 = min(len(poses), int(inside[-1]) + 2)
+        i0, i1 = int(inside[0]), int(inside[-1]) + 1
         return poses[i0:i1], timestamps_us[i0:i1]
 
     def _scene_frames(self, dir_path, suffix):
